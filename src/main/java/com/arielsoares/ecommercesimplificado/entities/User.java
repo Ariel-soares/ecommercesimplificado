@@ -3,10 +3,16 @@ package com.arielsoares.ecommercesimplificado.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
+import com.arielsoares.ecommercesimplificado.entities.enums.UserRole;
+
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name="tb_user")
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -18,6 +24,7 @@ public class User implements Serializable {
 	private String username;
 	private String password;
 	private String email;
+	private UserRole role;
 	
 	public User() {
 	}
@@ -70,6 +77,14 @@ public class User implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+	
+	public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
 
 	@Override
 	public int hashCode() {
