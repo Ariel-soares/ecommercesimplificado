@@ -21,8 +21,20 @@ public class Product implements Serializable {
     private String name;
     private String description;
     private Double price;
+    private Integer storage_quantity;
+    private Boolean active;
+    
+    public Product() {}
 	
-    public Long getId() {
+    public Product(Long id, String name, String description, Double price, Boolean active) {
+		this.id = id;
+		this.name = name;
+		this.description = description;
+		this.price = price;
+		this.active = active;
+	}
+    
+	public Long getId() {
 		return id;
 	}
 	public void setId(Long id) {
@@ -60,6 +72,18 @@ public class Product implements Serializable {
 			return false;
 		Product other = (Product) obj;
 		return Objects.equals(id, other.id);
+	}
+	public Integer getStorage_quantity() {
+		return storage_quantity;
+	}
+	public void setStorage_quantity(Integer storage_quantity) {
+		this.storage_quantity = storage_quantity;
+	}
+	public boolean isActive() {
+		return active;
+	}
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
     
