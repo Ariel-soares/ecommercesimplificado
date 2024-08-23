@@ -22,17 +22,16 @@ public class Product implements Serializable {
 	private String description;
 	private Double price;
 	private Integer storage_quantity;
-	private Boolean active;
+	private Boolean active = true;
 
 	public Product() {
 	}
 
-	public Product(Long id, String name, String description, Double price, Integer quantity) {
-		this.id = id;
+	public Product(String name, String description, Double price, Integer quantity) {
 		this.name = name;
 		this.description = description;
 		this.price = price;
-		this.active = true;
+		this.storage_quantity = quantity;
 	}
 
 	public Long getId() {

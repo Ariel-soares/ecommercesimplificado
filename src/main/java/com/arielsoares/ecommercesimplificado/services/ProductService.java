@@ -21,7 +21,7 @@ public class ProductService {
 
 	public Product findById(Long id) {
 		Optional<Product> obj = repository.findById(id);
-		return obj.get();
+		return obj.orElseThrow();
 	}
 
 	public Product insert(Product Product) {

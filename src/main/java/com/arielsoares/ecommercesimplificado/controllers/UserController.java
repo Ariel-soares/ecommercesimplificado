@@ -1,4 +1,4 @@
-package com.arielsoares.ecommercesimplificado;
+package com.arielsoares.ecommercesimplificado.controllers;
 
 import java.net.URI;
 import java.util.List;
