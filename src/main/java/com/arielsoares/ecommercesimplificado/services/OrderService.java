@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.arielsoares.ecommercesimplificado.entities.Order;
@@ -15,10 +16,12 @@ public class OrderService {
 	@Autowired
 	private OrderRepository repository;
 
+	@Cacheable(value = "allOrders")
 	public List<Order> findAll() {
 		return repository.findAll();
 	}
 
+	@Cacheable(value = "orders", key = "#id")
 	public Order findById(Long id) {
 		Optional<Order> obj = repository.findById(id);
 		return obj.orElseThrow();
