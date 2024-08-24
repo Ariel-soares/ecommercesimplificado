@@ -3,7 +3,9 @@ package com.arielsoares.ecommercesimplificado.entities.enums;
 public enum UserRole {
 
 	ADMIN("admin"),
-    USER("user");
+    USER("user"),
+    CLIENT("client")
+    ;
 
     private String role;
 
