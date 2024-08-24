@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.arielsoares.ecommercesimplificado.entities.Product;
 import com.arielsoares.ecommercesimplificado.repositories.ProductRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class ProductService {
 
@@ -34,11 +36,23 @@ public class ProductService {
 	public void delete(Long id) {
 		repository.deleteById(id);
 	}
-	
-	/*
-	 * public Product update(Long id, Product Product) { Product obj =
-	 * repository.getReferenceById(id); updateData(obj, Product); return
-	 * repository.save(obj); }
-	 */
 
+	public Product update(Long id, Product newProduct) {
+
+		Optional<Product> optionalProduct = repository.findById(id);
+
+		if (optionalProduct.isPresent()) {
+
+			Product product = optionalProduct.get();
+			product.setName(newProduct.getName());
+			product.setDescription(newProduct.getDescription());
+			product.setPrice(newProduct.getPrice());
+			product.setStorage_quantity(newProduct.getStorage_quantity());
+
+			return repository.save(product);
+		} else {
+			throw new EntityNotFoundException("Product not found");
+		}
+	}
+	
 }
