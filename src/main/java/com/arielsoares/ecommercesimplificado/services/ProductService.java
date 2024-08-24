@@ -25,8 +25,7 @@ public class ProductService {
 
 	@Cacheable(value = "products", key = "#id")
 	public Product findById(Long id) {
-		Optional<Product> obj = repository.findById(id);
-		return obj.orElseThrow();
+		return repository.findById(id).orElseThrow(() -> new RuntimeException("User not found with id " + id));
 	}
 
 	public Product insert(Product Product) {
