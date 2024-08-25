@@ -8,7 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "tb_product")
@@ -24,8 +27,12 @@ public class Product implements Serializable {
 	private String name;
 	private String description;
 	
-	
+	@NotNull(message = "Price cannot be null")
+    @DecimalMin(value = "0.01", message = "Price must be greater than 0")
+    @Digits(integer = 10, fraction = 2, message = "Price must be a valid monetary amount with up to two decimal places")
 	private Double price;
+	
+	@NotNull(message = "There must be an initial quantity, even if it is 0")
 	private Integer storage_quantity;
 	private Boolean active = true;
 

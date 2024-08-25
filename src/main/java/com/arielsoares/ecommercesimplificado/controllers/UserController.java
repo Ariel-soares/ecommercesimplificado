@@ -17,6 +17,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.services.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
@@ -37,7 +39,7 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<User> insert(@RequestBody User user) {
+	public ResponseEntity<User> insert(@Valid @RequestBody User user) {
 		user = service.insert(user);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
 		return ResponseEntity.created(uri).body(user);

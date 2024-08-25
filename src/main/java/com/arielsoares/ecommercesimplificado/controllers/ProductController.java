@@ -18,6 +18,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.arielsoares.ecommercesimplificado.entities.Product;
 import com.arielsoares.ecommercesimplificado.services.ProductService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/products")
 public class ProductController {
@@ -38,7 +40,7 @@ public class ProductController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Product> insert(@RequestBody Product Product) {
+	public ResponseEntity<Product> insert(@Valid @RequestBody Product Product) {
 		Product = service.insert(Product);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(Product.getId()).toUri();
 		return ResponseEntity.created(uri).body(Product);
