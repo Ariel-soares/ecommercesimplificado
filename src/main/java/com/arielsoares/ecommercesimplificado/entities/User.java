@@ -37,7 +37,7 @@ public class User implements Serializable {
 	
 	@Email(message = "Email should be valid")
 	private String email;
-	private UserRole role;
+	private UserRole role = UserRole.CLIENT;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")

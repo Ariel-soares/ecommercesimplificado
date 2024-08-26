@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.arielsoares.ecommercesimplificado.entities.Order;
+import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.services.OrderService;
+import com.arielsoares.ecommercesimplificado.services.UserService;
 
 @RestController
 @RequestMapping(value = "/orders")
@@ -23,6 +25,9 @@ public class OrderController {
 
 	@Autowired
 	private OrderService service;
+	
+	@Autowired
+	private UserService userService;
 
 	@GetMapping
 	public ResponseEntity<List<Order>> findAll() {
@@ -36,11 +41,16 @@ public class OrderController {
 		return ResponseEntity.ok().body(obj);
 	}
 	
-	@PostMapping
-	public ResponseEntity<Order> insert(@RequestBody Order Order) {
-		Order = service.insert(Order);
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(Order.getId()).toUri();
-		return ResponseEntity.created(uri).body(Order);
+	@PostMapping(value = "/{userId}")
+	public ResponseEntity<Order> insert(@PathVariable Long userId) {
+		
+		User user = userService.findById(userId);
+		
+		Order order = new Order(user);
+		
+		Order newOrder = service.insert(order);
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.getId()).toUri();
+		return ResponseEntity.created(uri).body(newOrder);
 	}
 
 	@DeleteMapping(value = "/{id}")

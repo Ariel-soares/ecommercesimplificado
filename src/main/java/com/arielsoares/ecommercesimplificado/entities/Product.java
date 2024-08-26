@@ -34,17 +34,16 @@ public class Product implements Serializable {
 	
 	@NotNull(message = "There must be an initial quantity, even if it is 0")
 	private Integer storage_quantity;
-	private Boolean active;
+	private Boolean active = true;
 
 	public Product() {
 	}
 
-	public Product(String name, String description, Double price, Integer quantity, Boolean active) {
+	public Product(String name, String description, Double price, Integer quantity) {
 		this.name = name;
 		this.description = description;
 		this.price = price;
 		this.storage_quantity = quantity;
-		this.active = active;
 	}
 
 	public Long getId() {
