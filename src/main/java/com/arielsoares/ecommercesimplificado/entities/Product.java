@@ -8,8 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -29,21 +29,22 @@ public class Product implements Serializable {
 	
 	@NotNull(message = "Price cannot be null")
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
-    @Digits(integer = 10, fraction = 2, message = "Price must be a valid monetary amount with up to two decimal places")
+	@DecimalMax(value = "9999999999.99", message = "Price must be less than 10 billion")
 	private Double price;
 	
 	@NotNull(message = "There must be an initial quantity, even if it is 0")
 	private Integer storage_quantity;
-	private Boolean active = true;
+	private Boolean active;
 
 	public Product() {
 	}
 
-	public Product(String name, String description, Double price, Integer quantity) {
+	public Product(String name, String description, Double price, Integer quantity, Boolean active) {
 		this.name = name;
 		this.description = description;
 		this.price = price;
 		this.storage_quantity = quantity;
+		this.active = active;
 	}
 
 	public Long getId() {

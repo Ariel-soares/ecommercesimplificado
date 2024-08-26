@@ -3,11 +3,11 @@ package com.arielsoares.ecommercesimplificado.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-import com.arielsoares.ecommercesimplificado.entities.pk.OrderItemPK;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,36 +16,37 @@ public class OrderItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private OrderItemPK id = new OrderItemPK();
+	@Id
+	private Long id;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 	private Integer quantity;
-	private Double price;
+	private Boolean active = true;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "product_id", nullable = false)
+	private Product product;
 
 	public OrderItem() {
 	}
 
-	public OrderItem(Order order, Product product, Integer quantity, Double price) {
+	public OrderItem(Product product, Integer quantity) {
 		this.quantity = quantity;
-		this.price = price;
-		id.setOrder(order);
-		id.setProduct(product);
-	}
-
-	@JsonIgnore
-	public Order getOrder() {
-		return id.getOrder();
-	}
-
-	public void setOrder(Order order) {
-		id.setOrder(order);
+		this.quantity = quantity;
 	}
 
 	public Product getProduct() {
-		return id.getProduct();
+		return product;
 	}
 
 	public void setProduct(Product product) {
-		id.setProduct(product);
+		this.product = product;
 	}
 
 	public Integer getQuantity() {
@@ -56,16 +57,16 @@ public class OrderItem implements Serializable {
 		this.quantity = quantity;
 	}
 
-	public Double getPrice() {
-		return price;
+	public Boolean getActive() {
+		return active;
 	}
 
-	public void setPrice(Double price) {
-		this.price = price;
+	public void setActive(Boolean active) {
+		this.active = active;
 	}
 
 	public Double getSubTotal() {
-		return price * quantity;
+		return product.getPrice() * this.quantity;
 	}
 
 	@Override
