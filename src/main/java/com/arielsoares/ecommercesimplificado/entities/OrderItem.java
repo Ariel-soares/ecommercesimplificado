@@ -18,6 +18,8 @@ public class OrderItem implements Serializable {
 
 	@Id
 	private Long id;
+	private Integer quantity;
+	private Boolean active = true;
 
 	public Long getId() {
 		return id;
@@ -26,8 +28,6 @@ public class OrderItem implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	private Integer quantity;
-	private Boolean active = true;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "product_id", nullable = false)
