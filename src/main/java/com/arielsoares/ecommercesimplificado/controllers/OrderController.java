@@ -2,6 +2,7 @@ package com.arielsoares.ecommercesimplificado.controllers;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -41,10 +42,10 @@ public class OrderController {
 		return ResponseEntity.ok().body(obj);
 	}
 	
-	@PostMapping(value = "/{userId}")
-	public ResponseEntity<Order> insert(@PathVariable Long userId) {
+	@PostMapping
+	public ResponseEntity<Order> insert(@RequestBody Map<String, Long> request) {
 		
-		User user = userService.findById(userId);
+		User user = userService.findById(request.get("id"));
 		
 		Order order = new Order(user);
 		
