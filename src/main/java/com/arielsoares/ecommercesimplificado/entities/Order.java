@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
@@ -36,6 +37,8 @@ public class Order implements Serializable {
 
 	@OneToMany
 	private Set<OrderItem> items = new HashSet<>();
+	
+	private OrderStatus status = OrderStatus.WAITING_PAYMENT;
 
 	public Order() {
 	}
@@ -77,8 +80,16 @@ public class Order implements Serializable {
 		return client;
 	}
 
-	public void setUser(User client) {
+	public void setClient(User client) {
 		this.client = client;
+	}
+
+	public OrderStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(OrderStatus status) {
+		this.status = status;
 	}
 
 	@Override
