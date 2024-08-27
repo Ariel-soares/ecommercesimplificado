@@ -24,7 +24,7 @@ public class OrderItem implements Serializable {
 	private Integer quantity;
 	private Boolean active = true;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "product_id", nullable = false)
 	private Product product;
 
