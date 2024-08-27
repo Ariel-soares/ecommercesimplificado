@@ -56,31 +56,27 @@ public class OrderController {
 	public ResponseEntity<Order> insert(@RequestBody Map<String, Long> request) {
 		
 		User user = userService.findById(request.get("id"));
-		
-		System.out.println(user);
-		
+
 		Product product = productService.findById(request.get("productId"));
-		
-		System.out.println(product);
 		
 		Order order = new Order(user);
 		
-		System.out.println("AQUI");
-		
-		OrderItem oi = orderItemService.insert(new OrderItem(product, 5));
-		
-		System.out.println("AQUI 2");
-		
-		System.out.println(oi);
+		OrderItem oi = orderItemService.insert(new OrderItem(product, request.get("quantity").intValue()));
 		
 		order.getItems().add(oi);
-		
-		System.out.println(order);
-		
+
 		Order newOrder = service.insert(order);
 		
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.getId()).toUri();
 		return ResponseEntity.created(uri).body(newOrder);
+	}
+	
+	@PostMapping(value = "/{orderId}/items")
+	public ResponseEntity<Order> addOrderItem(@RequestBody Map<String, Long> request, @PathVariable Long orderId ){
+		
+		Order order = service.addOrderItem(request.get("userId"), orderId, request.get("quantity").intValue(), request.get("productId"));
+		
+		return ResponseEntity.ok().body(order);
 	}
 
 	@DeleteMapping(value = "/{id}")

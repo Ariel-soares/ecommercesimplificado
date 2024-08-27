@@ -40,6 +40,7 @@ public class User implements Serializable {
 	@Email(message = "Email should be valid")
 	private String email;
 	private UserRole role = UserRole.CLIENT;
+	private boolean isActive = true;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")
@@ -94,6 +95,14 @@ public class User implements Serializable {
 		this.role = role;
 	}
 	
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
+	}
+
 	public List<Order> getOrders() {
 		return orders;
 	}
