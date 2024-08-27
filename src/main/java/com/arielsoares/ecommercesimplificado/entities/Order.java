@@ -2,9 +2,9 @@ package com.arielsoares.ecommercesimplificado.entities;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -35,7 +35,7 @@ public class Order implements Serializable {
 	private User client;
 
 	@OneToMany
-	private Set<OrderItem> items = new HashSet<>();
+	private List<OrderItem> items = new ArrayList<>();
 	
 	private OrderStatus status = OrderStatus.WAITING_PAYMENT;
 
@@ -63,7 +63,7 @@ public class Order implements Serializable {
 		this.moment = moment;
 	}
 	
-	public Set<OrderItem> getItems() {
+	public List<OrderItem> getItems() {
 		return items;
 	}
 

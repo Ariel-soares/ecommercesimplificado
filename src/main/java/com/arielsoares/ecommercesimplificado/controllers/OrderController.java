@@ -54,19 +54,7 @@ public class OrderController {
 	
 	@PostMapping
 	public ResponseEntity<Order> insert(@RequestBody Map<String, Long> request) {
-		
-		User user = userService.findById(request.get("id"));
-
-		Product product = productService.findById(request.get("productId"));
-		
-		Order order = new Order(user);
-		
-		OrderItem oi = orderItemService.insert(new OrderItem(product, request.get("quantity").intValue()));
-		
-		order.getItems().add(oi);
-
-		Order newOrder = service.insert(order);
-		
+		Order newOrder = service.insert(new Order(userService.findById(request.get("id"))));
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.getId()).toUri();
 		return ResponseEntity.created(uri).body(newOrder);
 	}

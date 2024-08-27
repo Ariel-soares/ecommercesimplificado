@@ -40,7 +40,7 @@ public class User implements Serializable {
 	@Email(message = "Email should be valid")
 	private String email;
 	private UserRole role = UserRole.CLIENT;
-	private boolean isActive = true;
+	private Boolean isActive = true;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")
