@@ -16,12 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.arielsoares.ecommercesimplificado.entities.Order;
-import com.arielsoares.ecommercesimplificado.entities.OrderItem;
-import com.arielsoares.ecommercesimplificado.entities.Product;
-import com.arielsoares.ecommercesimplificado.entities.User;
-import com.arielsoares.ecommercesimplificado.services.OrderItemService;
 import com.arielsoares.ecommercesimplificado.services.OrderService;
-import com.arielsoares.ecommercesimplificado.services.ProductService;
 import com.arielsoares.ecommercesimplificado.services.UserService;
 
 @RestController
@@ -33,12 +28,6 @@ public class OrderController {
 	
 	@Autowired
 	private UserService userService;
-	
-	@Autowired
-	private ProductService productService;
-	
-	@Autowired
-	private OrderItemService orderItemService;
 
 	@GetMapping
 	public ResponseEntity<List<Order>> findAll() {
@@ -50,6 +39,11 @@ public class OrderController {
 	public ResponseEntity<Order> findById(@PathVariable Long id) {
 		Order obj = service.findById(id);
 		return ResponseEntity.ok().body(obj);
+	}
+	
+	@GetMapping(value = "/client/{id}")
+	public ResponseEntity<List<Order>> findByClientId(@PathVariable Long id){
+		return ResponseEntity.ok().body(service.findByClientId(id));
 	}
 	
 	@PostMapping
@@ -66,6 +60,8 @@ public class OrderController {
 		
 		return ResponseEntity.ok().body(order);
 	}
+	
+	
 
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
