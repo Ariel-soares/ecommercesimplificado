@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import com.arielsoares.ecommercesimplificado.entities.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -32,6 +33,7 @@ public class User implements Serializable {
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
 	private String username;
 	
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@NotBlank(message = "Password is mandatory")
 	private String password;
 	
@@ -90,6 +92,10 @@ public class User implements Serializable {
 
 	public void setRole(UserRole role) {
 		this.role = role;
+	}
+	
+	public List<Order> getOrders() {
+		return orders;
 	}
 
 	@Override
