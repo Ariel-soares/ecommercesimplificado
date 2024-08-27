@@ -18,7 +18,7 @@ public class OrderItemService {
 	public List<OrderItem> findAll() {
 		return repository.findAll();
 	}
-	
+
 	public OrderItem findById(Long id) {
 		Optional<OrderItem> obj = repository.findById(id);
 		return obj.orElseThrow();
@@ -31,11 +31,11 @@ public class OrderItemService {
 	public void delete(Long id) {
 		repository.deleteById(id);
 	}
-	
-	/*
-	 * public OrderItem update(Long id, OrderItem OrderItem) { OrderItem obj =
-	 * repository.getReferenceById(id); updateData(obj, OrderItem); return
-	 * repository.save(obj); }
-	 */
+
+	public OrderItem update(Long id) {
+		OrderItem obj = findById(id);
+		obj.setActive(false);
+		return repository.save(obj);
+	}
 
 }

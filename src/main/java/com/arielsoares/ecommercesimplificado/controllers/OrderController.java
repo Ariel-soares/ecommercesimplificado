@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,6 +47,7 @@ public class OrderController {
 		return ResponseEntity.ok().body(service.findByClientId(id));
 	}
 	
+	//Refatorar futuramente para não utilizar um User Service nesta classe
 	@PostMapping
 	public ResponseEntity<Order> insert(@RequestBody Map<String, Long> request) {
 		Order newOrder = service.insert(new Order(userService.findById(request.get("id"))));
@@ -61,8 +63,14 @@ public class OrderController {
 		return ResponseEntity.ok().body(order);
 	}
 	
+	@PutMapping(value = "/{orderId}/items/{orderItemId}")
+	public ResponseEntity<Order> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId){
+		Order order = service.inactiveOrderItem(orderId, orderItemId);
+		return ResponseEntity.ok().body(order);
+	}
 	
-
+	
+	
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		service.delete(id);

@@ -42,6 +42,12 @@ public class OrderService {
 	public void delete(Long id) {
 		repository.deleteById(id);
 	}
+	
+	public Order update(Long id, Order order) {
+		Order obj = findById(id);
+		obj.setStatus(order.getStatus());
+		return insert(obj);
+	}
 
 	public Order addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
 		Product product = productService.findById(productId);
@@ -56,15 +62,17 @@ public class OrderService {
 		order.getItems().add(oi);
 		return insert(order);
 	}
-
-	public Order update(Long id, Order order) {
-		Order obj = findById(id);
-		obj.setStatus(order.getStatus());
-		return insert(obj);
-	}
 	
 	public List<Order> findByClientId(Long clientId){
 		return repository.findByClientId(clientId);
+	}
+	
+	public Order inactiveOrderItem(Long orderId, Long orderItemId) {
+		Order order = findById(orderId);
+		for(OrderItem oi : order.getItems()) {
+			if(oi.getId() == orderItemId) orderItemService.update(orderItemId);
+		}
+		return findById(orderId);
 	}
 
 }

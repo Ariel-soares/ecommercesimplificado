@@ -70,7 +70,7 @@ public class Order implements Serializable {
 	public Double getTotal() {
 		Double total = 0.0;
 		for (OrderItem item : items) {
-			total += item.getSubTotal();
+			if(item.getActive() == true)total += item.getSubTotal();
 		}
 		return total;
 	}
