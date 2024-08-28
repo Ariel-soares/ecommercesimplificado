@@ -8,11 +8,11 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.OrderItem;
 import com.arielsoares.ecommercesimplificado.entities.Product;
+import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.arielsoares.ecommercesimplificado.repositories.OrderRepository;
 
 @Service
@@ -50,10 +50,13 @@ public class OrderService {
 	}
 
 	@CachePut(value = "orders", key = "#result.id")
-	@CacheEvict(value = "orders", allEntries = true)
-	public Order update(Long id, Order order) {
+	//@CacheEvict(value = "orders", allEntries = true)
+	public Order update(Long id, String status) {
+		
+		if(!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("DONE"))throw new IllegalArgumentException("Only CANCELLED status or DONE STATUS ACCEPTED ");
+		
 		Order obj = findById(id);
-		obj.setStatus(order.getStatus());
+		obj.setStatus(OrderStatus.valueOf(status.toUpperCase()));
 		return insert(obj);
 	}
 
