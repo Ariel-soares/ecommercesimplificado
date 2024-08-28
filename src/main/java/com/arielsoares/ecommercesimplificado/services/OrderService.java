@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.OrderItem;
@@ -24,31 +27,38 @@ public class OrderService {
 	@Autowired
 	private ProductService productService;
 
-	@Cacheable(value = "allOrders")
+	@Cacheable(value = "orders")
 	public List<Order> findAll() {
 		return repository.findAll();
 	}
 
-	@Cacheable(value = "orders", key = "#id")
-	public Order findById(Long id) {
-		Optional<Order> obj = repository.findById(id);
+	@Cacheable(value = "orders", key = "#orderId")
+	public Order findById(Long orderId) {
+		Optional<Order> obj = repository.findById(orderId);
 		return obj.orElseThrow();
 	}
 
+	@CachePut(value = "orders", key = "#result.id")
+	@CacheEvict(value = "orders", allEntries = true)
 	public Order insert(Order Order) {
 		return repository.save(Order);
 	}
 
+	@CacheEvict(value = "orders", allEntries = true)
 	public void delete(Long id) {
 		repository.deleteById(id);
 	}
-	
+
+	@CachePut(value = "orders", key = "#result.id")
+	@CacheEvict(value = "orders", allEntries = true)
 	public Order update(Long id, Order order) {
 		Order obj = findById(id);
 		obj.setStatus(order.getStatus());
 		return insert(obj);
 	}
 
+	@CachePut(value = "orders", key = "#result.id")
+	@CacheEvict(value = "orders", allEntries = true)
 	public Order addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
 		Product product = productService.findById(productId);
 		Order order = findById(orderId);
@@ -62,15 +72,18 @@ public class OrderService {
 		order.getItems().add(oi);
 		return insert(order);
 	}
-	
-	public List<Order> findByClientId(Long clientId){
+
+	public List<Order> findByClientId(Long clientId) {
 		return repository.findByClientId(clientId);
 	}
-	
+
+	@CachePut(value = "orders", key = "#result.id")
+	@CacheEvict(value = "orders", allEntries = true)
 	public Order inactiveOrderItem(Long orderId, Long orderItemId) {
 		Order order = findById(orderId);
-		for(OrderItem oi : order.getItems()) {
-			if(oi.getId() == orderItemId) orderItemService.update(orderItemId);
+		for (OrderItem oi : order.getItems()) {
+			if (oi.getId() == orderItemId)
+				orderItemService.update(orderItemId);
 		}
 		return findById(orderId);
 	}
