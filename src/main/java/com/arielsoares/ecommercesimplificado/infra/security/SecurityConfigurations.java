@@ -27,10 +27,10 @@ public class SecurityConfigurations {
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/auth/**").permitAll()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
-						.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN").requestMatchers("/client/**")
+						.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/client/**")
 						.hasAnyRole("CLIENT", "ADMIN")
 						.anyRequest().authenticated());
-
 		return http.build();
 	}
 

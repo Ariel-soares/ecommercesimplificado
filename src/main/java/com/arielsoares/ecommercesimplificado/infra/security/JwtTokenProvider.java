@@ -22,7 +22,7 @@ public class JwtTokenProvider {
     private long jwtExpirationMs;
 
     public String generateToken(Authentication authentication) {
-        User userPrincipal = (User) authentication.getPrincipal();
+    	User userPrincipal = (User) authentication.getPrincipal();
 
         return JWT.create()
                 .withSubject(userPrincipal.getUsername())

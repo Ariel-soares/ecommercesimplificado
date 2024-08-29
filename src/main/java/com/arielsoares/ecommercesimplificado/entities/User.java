@@ -43,9 +43,9 @@ public class User implements Serializable, UserDetails {
 	
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@NotBlank(message = "Password is mandatory")
-	
 	private String password;
 	
+	@NotBlank(message = "Email is mandatory")
 	@Email(message = "Email should be valid")
 	private String email;
 	
