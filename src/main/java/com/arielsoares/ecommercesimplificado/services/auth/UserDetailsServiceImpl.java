@@ -14,7 +14,7 @@ import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.repositories.UserRepository;
 
 @Service
-public class AuthorizationService implements UserDetailsService{
+public class UserDetailsServiceImpl implements UserDetailsService{
 
 	@Autowired
 	private UserRepository userRepository;

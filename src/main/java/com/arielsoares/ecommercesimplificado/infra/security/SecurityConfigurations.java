@@ -25,11 +25,11 @@ public class SecurityConfigurations {
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/api/auth/**").permitAll()
+						.requestMatchers("/auth/**").permitAll()
 						.requestMatchers("/admin/**").hasRole("ADMIN")
 						.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN").requestMatchers("/client/**")
-						.hasAnyRole("CLIENT", "ADMIN").anyRequest().authenticated())
-				.formLogin(form -> form.loginPage("/login").permitAll()).logout(logout -> logout.permitAll());
+						.hasAnyRole("CLIENT", "ADMIN")
+						.anyRequest().authenticated());
 
 		return http.build();
 	}
@@ -41,8 +41,8 @@ public class SecurityConfigurations {
 
 	@Bean
 	AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-		AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
-		auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-		return auth.build();
-	}
+        AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        return auth.build();
+    }
 }

@@ -37,11 +37,11 @@ public class UserController {
 		return ResponseEntity.ok().body(obj);
 	}
 
-	@PostMapping
+	/*@PostMapping
 	public ResponseEntity<User> insert(@Valid @RequestBody User user) {
-		user = service.insert(user);
+		user = service.registerUser(user);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();
 		return ResponseEntity.created(uri).body(user);
-	}
+	}*/
 
 }
