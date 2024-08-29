@@ -50,14 +50,30 @@ public class OrderService {
 	}
 
 	@CachePut(value = "orders", key = "#result.id")
-	//@CacheEvict(value = "orders", allEntries = true)
+	@CacheEvict(value = "orders", allEntries = true)
 	public Order update(Long id, String status) {
 		
 		if(!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("DONE"))throw new IllegalArgumentException("Only CANCELLED status or DONE STATUS ACCEPTED ");
 		
 		Order obj = findById(id);
-		obj.setStatus(OrderStatus.valueOf(status.toUpperCase()));
+		
+		if(obj.getStatus() == OrderStatus.DONE || obj.getStatus() == OrderStatus.CANCELLED) throw new IllegalArgumentException("Order is already " + obj.getStatus());
+		
+		if(status.toUpperCase().equals("DONE")) completeOrder(obj);
+		
 		return insert(obj);
+	}
+
+	private void completeOrder(Order obj) {
+		for(OrderItem oi : obj.getItems()) {
+			if(oi.getQuantity() > oi.getProduct().getStorage_quantity() || oi.getProduct().getStorage_quantity() == 0) throw new IllegalArgumentException("Insuficient Storage Quantity os this product");
+		}
+		for(OrderItem oi : obj.getItems()) {
+			Product product = oi.getProduct();
+			product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
+			productService.update(oi.getProduct().getId(), product);
+		}
+		obj.setStatus(OrderStatus.DONE);
 	}
 
 	@CachePut(value = "orders", key = "#result.id")
