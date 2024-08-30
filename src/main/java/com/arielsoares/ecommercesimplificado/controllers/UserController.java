@@ -30,8 +30,8 @@ public class UserController {
 		User obj = service.findById(id);
 		return ResponseEntity.ok().body(obj);
 	}
-
-	/*@PostMapping
+	/*
+	@PostMapping
 	public ResponseEntity<User> insert(@Valid @RequestBody User user) {
 		user = service.registerUser(user);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(user.getId()).toUri();

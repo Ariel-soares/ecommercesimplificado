@@ -42,7 +42,7 @@ public class OrderController {
 		return ResponseEntity.ok().body(obj);
 	}
 	
-	@GetMapping(value = "/client/{id}")
+	@GetMapping(value = "/client/{id}/orders")
 	public ResponseEntity<List<Order>> findByClientId(@PathVariable Long id){
 		return ResponseEntity.ok().body(service.findByClientId(id));
 	}
