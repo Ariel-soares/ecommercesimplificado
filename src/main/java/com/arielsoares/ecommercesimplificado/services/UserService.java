@@ -33,9 +33,9 @@ public class UserService {
 		repository.deleteById(id);
 	}
 	
-	public User findByEmail(String email) {
+	public Optional<User> findByEmail(String email) {
 		Optional<User> user = repository.findByEmail(email);
-		return user.orElseThrow(() -> new RuntimeException("User not found with Email " + email));
+		return user;
 	}
 
 }
