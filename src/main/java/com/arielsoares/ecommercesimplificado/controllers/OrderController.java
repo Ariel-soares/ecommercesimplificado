@@ -28,6 +28,7 @@ public class OrderController {
 	@Autowired
 	private OrderService service;
 
+	//OK
 	@GetMapping(value = "/all")
 	public ResponseEntity<List<Order>> findAll() {
 		List<Order> list = service.findAll();
@@ -35,17 +36,16 @@ public class OrderController {
 	}
 
 	// OK
-	@GetMapping(value = "/orders")
+	@GetMapping(value = "/myOrders")
 	public ResponseEntity<List<Order>> clientOrders() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return ResponseEntity.ok().body(service.findByClientId(user.getId()));
 	}
 
 	// OK
-	@GetMapping(value = "/userOrders")
-	public ResponseEntity<List<Order>> findByClientId() {
-		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return ResponseEntity.ok().body(service.findByClientId(user.getId()));
+	@GetMapping(value = "/userOrders/{userId}")
+	public ResponseEntity<List<Order>> findByClientId(@PathVariable Long userId) {
+		return ResponseEntity.ok().body(service.findByClientId(userId));
 	}
 
 	// OK
@@ -71,10 +71,11 @@ public class OrderController {
 	@PutMapping(value = "/{orderId}/inactiveOrderItem/{orderItemId}")
 	public ResponseEntity<Order> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Order order = service.inactiveOrderItem(orderId, orderItemId);
+		Order order = service.inactiveOrderItem(user.getId(), orderId, orderItemId);
 		return ResponseEntity.ok().body(order);
 	}
 
+	//OK
 	@PutMapping(value = "/{orderId}/orderStatus/{orderStatus}")
 	public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @PathVariable String orderStatus) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -87,5 +88,4 @@ public class OrderController {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
 	}
-
 }

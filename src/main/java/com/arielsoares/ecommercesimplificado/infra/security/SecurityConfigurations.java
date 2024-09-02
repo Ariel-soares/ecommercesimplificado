@@ -27,12 +27,10 @@ public class SecurityConfigurations {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers("/auth/**").permitAll()
-						.requestMatchers("/orders/all").hasRole("ADMIN")
-						.requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-						.requestMatchers("/client/**").hasAnyRole("CLIENT", "ADMIN")
 						.requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
+						.requestMatchers("/products/userOrders/**").hasAnyRole("USER", "ADMIN")
 						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
