@@ -38,14 +38,14 @@ public class ProductController {
 		return ResponseEntity.ok().body(obj);
 	}
 
-	@PostMapping(value = "/admin")
+	@PostMapping
 	public ResponseEntity<Product> insert(@Valid @RequestBody Product Product) {
 		Product = service.insert(Product);
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(Product.getId()).toUri();
 		return ResponseEntity.created(uri).body(Product);
 	}
 	
-	@PutMapping(value = "/admin/{id}")
+	@PutMapping(value = "/{id}")
 	public ResponseEntity<Product> update(@PathVariable Long id, @Valid @RequestBody Product product){
 		product = service.update(id, product);
 		return ResponseEntity.ok().body(product);

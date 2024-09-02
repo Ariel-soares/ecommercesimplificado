@@ -34,20 +34,21 @@ public class OrderController {
 		return ResponseEntity.ok().body(list);
 	}
 
-	//OK
+	// OK
 	@GetMapping(value = "/orders")
 	public ResponseEntity<List<Order>> clientOrders() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return ResponseEntity.ok().body(service.findByClientId(user.getId()));
 	}
 
-	//OK
+	// OK
 	@GetMapping(value = "/userOrders")
 	public ResponseEntity<List<Order>> findByClientId() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return ResponseEntity.ok().body(service.findByClientId(user.getId()));
 	}
-	//OK
+
+	// OK
 	@PostMapping(value = "/newOrder")
 	public ResponseEntity<Order> insert() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -57,17 +58,16 @@ public class OrderController {
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
-	// Refatorar futuramente
+	// Refatorar futuramente -> Por caus dos map, substituir por DTO
 	@PostMapping(value = "/{orderId}/item")
 	public ResponseEntity<Order> addOrderItem(@RequestBody Map<String, Long> request, @PathVariable Long orderId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Order order = service.addOrderItem(user.getId(), orderId, request.get("quantity").intValue(),
 				request.get("productId"));
-
 		return ResponseEntity.ok().body(order);
 	}
-	
-	//OK
+
+	// OK
 	@PutMapping(value = "/{orderId}/inactiveOrderItem/{orderItemId}")
 	public ResponseEntity<Order> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -75,11 +75,10 @@ public class OrderController {
 		return ResponseEntity.ok().body(order);
 	}
 
-	
 	@PutMapping(value = "/{orderId}/orderStatus/{orderStatus}")
 	public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @PathVariable String orderStatus) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Order order = service.update(user, orderId, orderStatus);
+		Order order = service.update(user.getId(), orderId, orderStatus);
 		return ResponseEntity.ok().body(order);
 	}
 

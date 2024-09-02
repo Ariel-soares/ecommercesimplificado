@@ -86,7 +86,7 @@ public class Product implements Serializable {
 		this.storage_quantity = storage_quantity;
 	}
 
-	public boolean isActive() {
+	public boolean getActive() {
 		return active;
 	}
 

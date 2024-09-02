@@ -53,27 +53,44 @@ public class OrderService {
 		repository.deleteById(id);
 	}
 
-	//Refatorar no futuro
+	//Refatorar no futuro -> adicionar método inactive order
 	@CachePut(value = "orders", key = "#result.id")
 	@CacheEvict(value = "orders", allEntries = true)
-	public Order update(User user, Long id, String status) {
+	public Order update(Long userId, Long id, String status) {
 		
-		if(!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("DONE"))throw new IllegalArgumentException("Only CANCELLED status or PAID STATUS ACCEPTED ");
+		if(!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("PAID"))throw new IllegalArgumentException("Only CANCELLED status or PAID STATUS ACCEPTED ");
 		
+		List<Order> clientOrders = findByClientId(userId);
 		Order obj = findById(id);
+		if(!clientOrders.contains(obj)) throw new RuntimeException("Client can update only their own orders");
 		
-		if(obj.getStatus() == OrderStatus.COMPLETE || obj.getStatus() == OrderStatus.CANCELLED) throw new IllegalArgumentException("Order is already " + obj.getStatus());
+		if(obj.getStatus() == OrderStatus.PAID || obj.getStatus() == OrderStatus.COMPLETE || obj.getStatus() == OrderStatus.CANCELLED) throw new IllegalArgumentException("Order is already " + obj.getStatus());
 		
 		if(status.toUpperCase().equals("PAID")) completeOrder(obj);
 		
+		if(status.toUpperCase().equals("CANCELLED")) obj.setStatus(OrderStatus.CANCELLED);
+		
 		return insert(obj);
 	}
-
+	
+	//OK
 	private void completeOrder(Order obj) {
+		
+		Integer quantity = 0;
 		for(OrderItem oi : obj.getItems()) {
-			if(oi.getQuantity() > oi.getProduct().getStorage_quantity() || oi.getProduct().getStorage_quantity() == 0) throw new IllegalArgumentException("Insuficient Storage Quantity os this product");
+			if(!oi.getProduct().getActive() || !oi.getActive()) continue;
+			quantity += 1;
 		}
+		if(quantity < 1) throw new RuntimeException("Order can only be completed if it has at least 1 active Item");
+		
+		//Confere se todos os items pedem menos que o do estoque
 		for(OrderItem oi : obj.getItems()) {
+			if(!oi.getProduct().getActive() || !oi.getActive()) continue;
+			if(oi.getQuantity() > oi.getProduct().getStorage_quantity() || oi.getProduct().getStorage_quantity() == 0) throw new IllegalArgumentException("Insuficient Storage Quantity of this product " + oi.getProduct().getName());
+		}
+		
+		for(OrderItem oi : obj.getItems()) {
+			if(!oi.getProduct().getActive() || !oi.getActive()) continue;
 			Product product = oi.getProduct();
 			product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
 			productService.update(oi.getProduct().getId(), product);
@@ -81,6 +98,7 @@ public class OrderService {
 		obj.setStatus(OrderStatus.PAID);
 	}
 
+	//Refatorar -> Orderm não pode ser atualizada caso já esteja fechada ou paga
 	@CachePut(value = "orders", key = "#result.id")
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
@@ -103,7 +121,8 @@ public class OrderService {
 	public List<Order> findByClientId(Long clientId) {
 		return repository.findByClientId(clientId);
 	}
-
+	
+	//OK
 	@CachePut(value = "orders", key = "#result.id")
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order inactiveOrderItem(Long orderId, Long orderItemId) {
