@@ -49,6 +49,7 @@ public class User implements Serializable, UserDetails {
 	@Email(message = "Email should be valid")
 	private String email;
 	
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Enumerated(EnumType.STRING)
 	private UserRole role = UserRole.CLIENT;
 	private Boolean isActive = true;
@@ -56,6 +57,8 @@ public class User implements Serializable, UserDetails {
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")
 	private List<Order> orders = new ArrayList<>();
+	
+	
 
 	public User() {
 	}
@@ -135,26 +138,31 @@ public class User implements Serializable, UserDetails {
 		return Objects.equals(id, other.id);
 	}
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
 	}
 	
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Override
     public boolean isAccountNonExpired() {
         return true;
     }
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isAccountNonLocked() {
         return true;
     }
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isEnabled() {
         return isActive;

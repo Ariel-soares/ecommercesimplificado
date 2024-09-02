@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.OrderItem;
 import com.arielsoares.ecommercesimplificado.entities.Product;
+import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.arielsoares.ecommercesimplificado.repositories.OrderRepository;
 
@@ -26,6 +27,9 @@ public class OrderService {
 
 	@Autowired
 	private ProductService productService;
+	
+	@Autowired
+	private UserService userService;
 
 	@Cacheable(value = "orders")
 	public List<Order> findAll() {
@@ -49,17 +53,18 @@ public class OrderService {
 		repository.deleteById(id);
 	}
 
+	//Refatorar no futuro
 	@CachePut(value = "orders", key = "#result.id")
 	@CacheEvict(value = "orders", allEntries = true)
-	public Order update(Long id, String status) {
+	public Order update(User user, Long id, String status) {
 		
-		if(!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("DONE"))throw new IllegalArgumentException("Only CANCELLED status or DONE STATUS ACCEPTED ");
+		if(!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("DONE"))throw new IllegalArgumentException("Only CANCELLED status or PAID STATUS ACCEPTED ");
 		
 		Order obj = findById(id);
 		
-		if(obj.getStatus() == OrderStatus.DONE || obj.getStatus() == OrderStatus.CANCELLED) throw new IllegalArgumentException("Order is already " + obj.getStatus());
+		if(obj.getStatus() == OrderStatus.COMPLETE || obj.getStatus() == OrderStatus.CANCELLED) throw new IllegalArgumentException("Order is already " + obj.getStatus());
 		
-		if(status.toUpperCase().equals("DONE")) completeOrder(obj);
+		if(status.toUpperCase().equals("PAID")) completeOrder(obj);
 		
 		return insert(obj);
 	}
@@ -73,14 +78,17 @@ public class OrderService {
 			product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
 			productService.update(oi.getProduct().getId(), product);
 		}
-		obj.setStatus(OrderStatus.DONE);
+		obj.setStatus(OrderStatus.PAID);
 	}
 
 	@CachePut(value = "orders", key = "#result.id")
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
-		Product product = productService.findById(productId);
 		Order order = findById(orderId);
+		User newUser = userService.findById(userId);
+		if(!newUser.getOrders().contains(order))throw new RuntimeException();
+		Product product = productService.findById(productId);
+		
 		OrderItem oi = orderItemService.insert(new OrderItem(product, quantity));
 		for (OrderItem i : order.getItems()) {
 			if (i.getProduct() == oi.getProduct()) {

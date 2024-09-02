@@ -15,7 +15,7 @@ PESO (1)
 [X] Implementar Autenticação via Token JWT. PESO (3)
 [X] Implementar Autorização para os usuários autenticados. PESO (3)
 [] Implementar um método para resetar a senha do usuário. PESO (3)
-[] Somente usuários com permissão de ADMIN podem deletar informações do
+[X] Somente usuários com permissão de ADMIN podem deletar informações do
 sistema. PESO (3)
 [] Somente usuários com permissão de ADMIN podem cadastrar e atualizar
 novos produtos e outros usuários ADMIN. PESO (2)

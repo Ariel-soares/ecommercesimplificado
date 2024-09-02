@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.arielsoares.ecommercesimplificado.entities.Order;
+import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.services.OrderService;
-import com.arielsoares.ecommercesimplificado.services.UserService;
 
 @RestController
 @RequestMapping(value = "/orders")
@@ -27,64 +28,62 @@ public class OrderController {
 	@Autowired
 	private OrderService service;
 
-	@Autowired
-	private UserService userService;
-
-	@GetMapping(value = "/admin")
+	@GetMapping(value = "/all")
 	public ResponseEntity<List<Order>> findAll() {
 		List<Order> list = service.findAll();
 		return ResponseEntity.ok().body(list);
 	}
 
-	@GetMapping(value = "/client/{id}")
-	public ResponseEntity<Order> findById(@PathVariable Long id) {
-		Order obj = service.findById(id);
-		return ResponseEntity.ok().body(obj);
+	//OK
+	@GetMapping(value = "/orders")
+	public ResponseEntity<List<Order>> clientOrders() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return ResponseEntity.ok().body(service.findByClientId(user.getId()));
 	}
 
-	@GetMapping(value = "/client")
-	public ResponseEntity<Order> Test() {
-
-		return ResponseEntity.ok().build();
+	//OK
+	@GetMapping(value = "/userOrders")
+	public ResponseEntity<List<Order>> findByClientId() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		return ResponseEntity.ok().body(service.findByClientId(user.getId()));
 	}
-
-	@GetMapping(value = "/client/{id}/orders")
-	public ResponseEntity<List<Order>> findByClientId(@PathVariable Long id) {
-		return ResponseEntity.ok().body(service.findByClientId(id));
-	}
-
-	// Refatorar futuramente para não utilizar um User Service nesta classe
-	@PostMapping(value = "/client")
-	public ResponseEntity<Order> insert(@RequestBody Map<String, Long> request) {
-		Order newOrder = service.insert(new Order(userService.findById(request.get("id"))));
+	//OK
+	@PostMapping(value = "/newOrder")
+	public ResponseEntity<Order> insert() {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Order newOrder = service.insert(new Order(user));
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.getId())
 				.toUri();
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
 	// Refatorar futuramente
-	@PostMapping(value = "/client/{orderId}/items")
+	@PostMapping(value = "/{orderId}/item")
 	public ResponseEntity<Order> addOrderItem(@RequestBody Map<String, Long> request, @PathVariable Long orderId) {
-
-		Order order = service.addOrderItem(request.get("userId"), orderId, request.get("quantity").intValue(),
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Order order = service.addOrderItem(user.getId(), orderId, request.get("quantity").intValue(),
 				request.get("productId"));
 
 		return ResponseEntity.ok().body(order);
 	}
-
-	@PutMapping(value = "/client/{orderId}/items/{orderItemId}")
+	
+	//OK
+	@PutMapping(value = "/{orderId}/inactiveOrderItem/{orderItemId}")
 	public ResponseEntity<Order> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Order order = service.inactiveOrderItem(orderId, orderItemId);
 		return ResponseEntity.ok().body(order);
 	}
 
-	@PutMapping(value = "/client/{orderId}/{orderStatus}")
+	
+	@PutMapping(value = "/{orderId}/orderStatus/{orderStatus}")
 	public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @PathVariable String orderStatus) {
-		Order order = service.update(orderId, orderStatus);
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Order order = service.update(user, orderId, orderStatus);
 		return ResponseEntity.ok().body(order);
 	}
 
-	@DeleteMapping(value = "/admin/{id}")
+	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		service.delete(id);
 		return ResponseEntity.noContent().build();
