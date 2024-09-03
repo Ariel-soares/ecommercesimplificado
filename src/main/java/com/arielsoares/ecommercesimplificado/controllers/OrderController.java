@@ -2,7 +2,6 @@ package com.arielsoares.ecommercesimplificado.controllers;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderItemDTO;
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.services.OrderService;
@@ -58,12 +58,12 @@ public class OrderController {
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
-	// Refatorar futuramente -> Por caus dos map, substituir por DTO
+	// Refatorar futuramente -> Por causa dos map, substituir por DTO
 	@PostMapping(value = "/{orderId}/item")
-	public ResponseEntity<Order> addOrderItem(@RequestBody Map<String, Long> request, @PathVariable Long orderId) {
+	public ResponseEntity<Order> addOrderItem(@RequestBody OrderItemDTO body, @PathVariable Long orderId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Order order = service.addOrderItem(user.getId(), orderId, request.get("quantity").intValue(),
-				request.get("productId"));
+		Order order = service.addOrderItem(user.getId(), orderId, body.quantity(),
+				body.productId());
 		return ResponseEntity.ok().body(order);
 	}
 

@@ -52,27 +52,13 @@ public class AuthenticationController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) {
-		/*
-		 * try { Authentication authentication = authenticationManager .authenticate(new
-		 * UsernamePasswordAuthenticationToken(username, password));
-		 * 
-		 * String token = jwtTokenProvider.generateToken(authentication); return
-		 * ResponseEntity.ok(new AuthResponse(token)); } catch (AuthenticationException
-		 * e) { return
-		 * ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: "
-		 * + e.getMessage()); }
-		 */
-
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(body.email(), body.password()));
 
-		// Definir o contexto de segurança
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		// Gerar o token JWT
 		String jwt = tokenService.generateToken(body.email());
 
-		// Retornar o token JWT no corpo da resposta
-		return ResponseEntity.ok(new ResponseDTO("user", jwt));
+		return ResponseEntity.ok(new ResponseDTO(body.email(), jwt));
 	}
 }
