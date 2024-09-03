@@ -21,6 +21,10 @@ public class UserService {
 	public List<User> findAll() {
 		return repository.findAll();
 	}
+	
+	public User insert(User user) {
+		return repository.save(user);
+	}
 
 	public User findById(Long id) {
 		Optional<User> obj = repository.findById(id);
@@ -42,7 +46,7 @@ public class UserService {
 		return user;
 	}
 
-	public User update(Long id, String role, User operatorUser) {
+	public User updateRole(Long id, String role, User operatorUser) {
 
 		User operator = findById(operatorUser.getId());
 		User newUser = findById(id);
@@ -54,6 +58,7 @@ public class UserService {
 		return repository.save(newUser);
 	}
 
+	// Conferir depois
 	public User inactivateUser(Long id, User operatorUser) {
 		User operator = findById(operatorUser.getId());
 		User newUser = findById(id);
@@ -64,7 +69,5 @@ public class UserService {
 		newUser.setIs_active(false);
 		return repository.save(newUser);
 	}
-	
-	
 
 }

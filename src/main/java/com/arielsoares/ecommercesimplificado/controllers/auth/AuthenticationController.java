@@ -1,5 +1,8 @@
 package com.arielsoares.ecommercesimplificado.controllers.auth;
 
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +20,8 @@ import com.arielsoares.ecommercesimplificado.controllers.auth.DTO.ResponseDTO;
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.infra.security.TokenService;
 import com.arielsoares.ecommercesimplificado.services.UserService;
+import com.arielsoares.ecommercesimplificado.services.mail.EmailService;
+import com.arielsoares.ecommercesimplificado.services.utils.PasswordManagerService;
 
 import jakarta.validation.Valid;
 
@@ -28,13 +33,17 @@ public class AuthenticationController {
 	private UserService userService;
 	private TokenService tokenService;
 	private final PasswordEncoder passwordEncoder;
+	private EmailService mailService;
+	private PasswordManagerService passwordService;
 
 	public AuthenticationController(UserService userService, TokenService tokenService, PasswordEncoder passwordEncoder,
-			AuthenticationManager authenticationManager) {
+			AuthenticationManager authenticationManager, EmailService mailService, PasswordManagerService passwordService) {
 		this.userService = userService;
 		this.tokenService = tokenService;
 		this.authenticationManager = authenticationManager;
 		this.passwordEncoder = passwordEncoder;
+		this.mailService = mailService;
+		this.passwordService = passwordService;
 	}
 
 	@PostMapping("/register")
@@ -63,4 +72,37 @@ public class AuthenticationController {
 
 		return ResponseEntity.ok(new ResponseDTO(body.email(), jwt));
 	}
+	
+	@PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String resetToken = passwordService.createPasswordResetToken(email);
+
+        if (resetToken != null) {
+            String subject = "Password Reset Request";
+            String body = "Use the following token to reset your password on the endpoint: /reset-password/confirm\n" + resetToken;
+
+            mailService.sendSimpleEmail(email, subject, body);
+            return ResponseEntity.ok("Password reset email sent.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email address not found.");
+        }
+    }
+	
+	@PostMapping("/reset-password/confirm")
+	public ResponseEntity<String> confirmResetPassword(@RequestBody Map<String, String> request) {
+	    String token = request.get("token");
+	    String newPassword = request.get("newPassword");
+	    
+	    System.out.println("token: " + token + " PAssword: " + newPassword);
+
+	    boolean isReset = passwordService.resetPassword(token, newPassword);
+
+	    if (isReset) {
+	        return ResponseEntity.ok("Password reset successfully.");
+	    } else {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token or token expired.");
+	    }
+	}
+	
 }

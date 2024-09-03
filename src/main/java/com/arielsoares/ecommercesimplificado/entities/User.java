@@ -1,6 +1,8 @@
 package com.arielsoares.ecommercesimplificado.entities;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +17,7 @@ import com.arielsoares.ecommercesimplificado.entities.enums.UserRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -52,6 +55,9 @@ public class User implements Serializable, UserDetails {
 	@NotBlank(message = "Email is mandatory")
 	@Email(message = "Email should be valid")
 	private String email;
+	
+	@Column(name = "last_password_change_date")
+    private LocalDateTime lastPasswordChangeDate;
 	
 	
 	@Enumerated(EnumType.STRING)
@@ -110,6 +116,14 @@ public class User implements Serializable, UserDetails {
 
 	public void setRole(UserRole role) {
 		this.role = role;
+	}
+	
+	public LocalDateTime getLastPasswordChangeDate() {
+		return lastPasswordChangeDate;
+	}
+
+	public void setLastPasswordChangeDate(LocalDateTime lastPasswordChangeDate) {
+		this.lastPasswordChangeDate = lastPasswordChangeDate;
 	}
 
 	public Boolean getIs_active() {
