@@ -21,31 +21,34 @@ public class UserController {
 	@Autowired
 	private UserService service;
 
-	//OK
-	@GetMapping(value = "/users")
+	// OK
+	@GetMapping
 	public ResponseEntity<List<User>> findAll() {
 		List<User> list = service.findAll();
 		return ResponseEntity.ok().body(list);
 	}
 
-	//OK
+	// OK
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		User obj = service.findById(id);
 		return ResponseEntity.ok().body(obj);
 	}
 
-	//OK
+	// OK
 	@PutMapping(value = "/updateUserRole/{id}/role/{userRole}")
-	public ResponseEntity<User> updateRole(@PathVariable Long id , @PathVariable String userRole){
+	public ResponseEntity<User> updateRole(@PathVariable Long id, @PathVariable String userRole) {
 		User operatorUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User user = service.update(id, userRole, operatorUser);
 		return ResponseEntity.ok().body(user);
 	}
+
 	
 	@PutMapping(value = "/inactiveUser/{id}")
-	public ResponseEntity<User> inactiveUser(@PathVariable Long id){
-		return null;
+	public ResponseEntity<User> inactivateUser(@PathVariable Long id) {
+		User operatorUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = service.inactivateUser(id, operatorUser);
+		return ResponseEntity.ok().body(user);
 	}
-	
+
 }

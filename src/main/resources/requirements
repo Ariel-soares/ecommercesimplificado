@@ -17,5 +17,5 @@ PESO (1) -: Importância nível 2 daqui pra frente
 [] Implementar um método para resetar a senha do usuário. PESO (3)
 [X] Somente usuários com permissão de ADMIN podem deletar informações do
 sistema. PESO (3)
-[] Somente usuários com permissão de ADMIN podem cadastrar e atualizar
+[X] Somente usuários com permissão de ADMIN podem cadastrar e atualizar
 novos produtos e outros usuários ADMIN. PESO (2) -> **Falta Users**

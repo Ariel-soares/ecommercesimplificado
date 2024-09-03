@@ -56,7 +56,8 @@ public class User implements Serializable, UserDetails {
 	
 	@Enumerated(EnumType.STRING)
 	private UserRole role = UserRole.CLIENT;
-	private Boolean isActive = true;
+	
+	private Boolean is_active = true;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")
@@ -110,13 +111,13 @@ public class User implements Serializable, UserDetails {
 	public void setRole(UserRole role) {
 		this.role = role;
 	}
-	
-	public boolean isActive() {
-		return isActive;
+
+	public Boolean getIs_active() {
+		return is_active;
 	}
 
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
+	public void setIs_active(Boolean is_active) {
+		this.is_active = is_active;
 	}
 
 	public List<Order> getOrders() {
@@ -164,10 +165,10 @@ public class User implements Serializable, UserDetails {
         return true;
     }
 
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	//@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Override
     public boolean isEnabled() {
-        return isActive;
+        return this.is_active;
     }
 
 }

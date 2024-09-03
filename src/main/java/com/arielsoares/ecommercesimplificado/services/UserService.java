@@ -51,9 +51,20 @@ public class UserService {
 			throw new IllegalArgumentException("ADMIN users can only be modified by other ADMIN users");
 
 		newUser.setRole(UserRole.valueOf(role.toUpperCase()));
-
 		return repository.save(newUser);
-
 	}
+
+	public User inactivateUser(Long id, User operatorUser) {
+		User operator = findById(operatorUser.getId());
+		User newUser = findById(id);
+
+		if (newUser.getRole() == UserRole.ADMIN && operator.getRole() != UserRole.ADMIN)
+			throw new IllegalArgumentException("ADMIN users can only be modified by other ADMIN users");
+
+		newUser.setIs_active(false);
+		return repository.save(newUser);
+	}
+	
+	
 
 }
