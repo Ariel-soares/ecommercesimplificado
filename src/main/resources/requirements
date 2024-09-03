@@ -10,7 +10,7 @@ ser feito um bom gerenciamento do cache, por exemplo: ao inserir uma nova
 venda, deletar o cache, para que a informação seja buscada no banco de dados
 diretamente e venha atualizada. PESO (1) -> **Falta REDIS**
 [] Todas as EXCEÇÕES devem ser tratadas e seguir o mesmo padrão de resposta.
-PESO (1)
+PESO (1) -: Importância nível 2 daqui pra frente
 [] Todos os campos data, devem seguir o padrão ISO 8601 (exemplo: 2023-07-20T12:00:00Z). PESO (1)
 [X] Implementar Autenticação via Token JWT. PESO (3)
 [X] Implementar Autorização para os usuários autenticados. PESO (3)

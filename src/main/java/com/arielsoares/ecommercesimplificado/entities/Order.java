@@ -38,7 +38,7 @@ public class Order implements Serializable {
 	private List<OrderItem> items = new ArrayList<>();
 	
 	private OrderStatus status = OrderStatus.WAITING_PAYMENT;
-
+	
 	public Order() {
 	}
 

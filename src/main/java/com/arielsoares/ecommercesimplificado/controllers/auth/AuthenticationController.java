@@ -18,6 +18,8 @@ import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.infra.security.TokenService;
 import com.arielsoares.ecommercesimplificado.services.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/auth")
 public class AuthenticationController {
@@ -36,7 +38,7 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@RequestBody RegisterRequestDTO body) {
+	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO body) {
 
 		User newUser = new User();
 		newUser.setEmail(body.email());

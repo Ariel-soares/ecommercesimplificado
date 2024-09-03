@@ -25,6 +25,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -37,19 +38,22 @@ public class User implements Serializable, UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotNull(message = "Name cannot be null")
 	@NotBlank(message = "Username is mandatory")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
 	private String username;
 	
+	@NotNull(message = "Password cannot be null")
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@NotBlank(message = "Password is mandatory")
 	private String password;
 	
+	@NotNull(message = "Email cannot be null")
 	@NotBlank(message = "Email is mandatory")
 	@Email(message = "Email should be valid")
 	private String email;
 	
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+	
 	@Enumerated(EnumType.STRING)
 	private UserRole role = UserRole.CLIENT;
 	private Boolean isActive = true;
@@ -58,8 +62,6 @@ public class User implements Serializable, UserDetails {
 	@OneToMany(mappedBy = "client")
 	private List<Order> orders = new ArrayList<>();
 	
-	
-
 	public User() {
 	}
 
