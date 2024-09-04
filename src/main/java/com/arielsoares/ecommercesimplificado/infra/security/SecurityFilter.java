@@ -39,7 +39,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             String email = tokenService.validateToken(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            	System.out.println();
+            	System.out.println("FILTER INTERNAL EMAIL: -> " + email);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
