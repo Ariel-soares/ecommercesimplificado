@@ -27,11 +27,10 @@ public class AuthenticationService {
 	private EmailService mailService;
 	private TokenService tokenService;
 	private AuthenticationManager authenticationManager;
-	
-	
 
 	public AuthenticationService(UserService userService, PasswordResetTokenRepository tokenRepository,
-			PasswordEncoder passwordEncoder, EmailService mailService, TokenService tokenService, AuthenticationManager authenticationManager) {
+			PasswordEncoder passwordEncoder, EmailService mailService, TokenService tokenService,
+			AuthenticationManager authenticationManager) {
 		this.userService = userService;
 		this.tokenRepository = tokenRepository;
 		this.passwordEncoder = passwordEncoder;
@@ -40,8 +39,8 @@ public class AuthenticationService {
 		this.tokenService = tokenService;
 	}
 
-	public String register(String email, String username, String password){
-		
+	public String register(String email, String username, String password) {
+
 		User newUser = new User();
 		newUser.setEmail(email);
 		newUser.setUsername(username);
@@ -49,42 +48,34 @@ public class AuthenticationService {
 
 		userService.registerUser(newUser);
 		String token = tokenService.generateToken(newUser.getEmail());
-		
+
 		return token;
 	}
-	
+
 	public String login(String email, String password) {
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-		
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
+
 		String token = tokenService.generateToken(email);
 		return token;
 	}
-	
-	
-	public String createPasswordResetToken(String email) {
-		User user = userService.findByEmail(email)
-				.orElseThrow(() -> new EntityNotFoundException("User not found for email: " + email));
-		if (user == null) {
-			return null;
+
+	public Boolean resetPassword(String email) {
+		String resetToken = createPasswordResetToken(email);
+
+		if (resetToken != null) {
+			String subject = "Password Reset Request";
+			String body = "Use the following token to reset your password on the endpoint: /reset-password/confirm\n"
+					+ resetToken;
+
+			mailService.sendSimpleEmail(email, subject, body);
+			return true;
+		} else {
+			return false;
 		}
-
-		String token = UUID.randomUUID().toString();
-		PasswordResetToken resetToken = new PasswordResetToken(token, user);
-		tokenRepository.save(resetToken);
-
-		return token;
 	}
-	
-	
-	
-	public String resetPassword(String email) {
-		return null;
-	}
-	
-	
 
 	public String confirmResetPassword(String token, String newPassword) {
 		PasswordResetToken resetToken = tokenRepository.findByToken(token);
@@ -99,12 +90,26 @@ public class AuthenticationService {
 		// método, para parar de usar o insert
 		userService.insert(user);
 		tokenRepository.delete(resetToken);
-		
+
 		String newToken = tokenService.generateToken(user.getEmail());
-		
+
 		mailService.sendSimpleEmail(user.getEmail(), "Password Reset Successful",
 				"Your password has been reset successfully.");
 		return newToken;
+	}
+	
+	public String createPasswordResetToken(String email) {
+		User user = userService.findByEmail(email)
+				.orElseThrow(() -> new EntityNotFoundException("User not found for email: " + email));
+		if (user == null) {
+			return null;
+		}
+
+		String token = UUID.randomUUID().toString();
+		PasswordResetToken resetToken = new PasswordResetToken(token, user);
+		tokenRepository.save(resetToken);
+
+		return token;
 	}
 
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.services.UserService;
-import com.arielsoares.ecommercesimplificado.services.mail.EmailService;
 
 @RestController
 @RequestMapping(value = "/users")
@@ -21,15 +20,11 @@ public class UserController {
 
 	@Autowired
 	private UserService service;
-	
-	@Autowired
-	private EmailService mailService;
 
 	// OK
 	@GetMapping
 	public ResponseEntity<List<User>> findAll() {
 		List<User> list = service.findAll();
-		mailService.sendSimpleEmail("ariel.sfranco@protonmail.com", "Teste", "Email para teste");
 		return ResponseEntity.ok().body(list);
 	}
 
@@ -48,7 +43,7 @@ public class UserController {
 		return ResponseEntity.ok().body(user);
 	}
 
-	
+	//Ainda com problema
 	@PutMapping(value = "/inactiveUser/{id}")
 	public ResponseEntity<User> inactivateUser(@PathVariable Long id) {
 		User operatorUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

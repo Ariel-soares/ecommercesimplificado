@@ -1,4 +1,4 @@
-package com.arielsoares.ecommercesimplificado.controllers.auth.DTO;
+package com.arielsoares.ecommercesimplificado.controllers.DTO;
 
 public record ResetPasswordDTO(String token, String newPassword) {
 
