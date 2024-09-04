@@ -30,7 +30,7 @@ public class DataSeeder implements CommandLineRunner {
             admin.setIs_active(true);
             userRepository.save(admin);
 
-            System.out.println("Admin user created with email: admin@example.com and password: admin123");
+            System.out.println("Admin user created with email: admin@example.com");
         }
     }
 }

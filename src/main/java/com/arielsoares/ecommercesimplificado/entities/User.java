@@ -1,7 +1,6 @@
 package com.arielsoares.ecommercesimplificado.entities;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,35 +39,34 @@ public class User implements Serializable, UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@NotNull(message = "Name cannot be null")
 	@NotBlank(message = "Username is mandatory")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
+	@Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
 	private String username;
-	
+
 	@NotNull(message = "Password cannot be null")
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@NotBlank(message = "Password is mandatory")
 	private String password;
-	
+
 	@NotNull(message = "Email cannot be null")
 	@NotBlank(message = "Email is mandatory")
 	@Email(message = "Email should be valid")
 	private String email;
-	
+
 	@Column(name = "last_password_change_date")
-    private LocalDateTime lastPasswordChangeDate;
-	
-	
+	private LocalDateTime lastGeneratedToken;
+
 	@Enumerated(EnumType.STRING)
 	private UserRole role = UserRole.CLIENT;
-	
+
 	private Boolean is_active = true;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")
 	private List<Order> orders = new ArrayList<>();
-	
+
 	public User() {
 	}
 
@@ -117,13 +115,13 @@ public class User implements Serializable, UserDetails {
 	public void setRole(UserRole role) {
 		this.role = role;
 	}
-	
-	public LocalDateTime getLastPasswordChangeDate() {
-		return lastPasswordChangeDate;
+
+	public LocalDateTime getLastGeneratedToken() {
+		return lastGeneratedToken;
 	}
 
-	public void setLastPasswordChangeDate(LocalDateTime lastPasswordChangeDate) {
-		this.lastPasswordChangeDate = lastPasswordChangeDate;
+	public void setLastPasswordChangeDate(LocalDateTime lastGeneratedToken) {
+		this.lastGeneratedToken = lastGeneratedToken;
 	}
 
 	public Boolean getIs_active() {
@@ -160,29 +158,28 @@ public class User implements Serializable, UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
 	}
-	
+
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+	public boolean isAccountNonExpired() {
+		return true;
+	}
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
 
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
 
-	//@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Override
-    public boolean isEnabled() {
-        return this.is_active;
-    }
+	@Override
+	public boolean isEnabled() {
+		return this.is_active;
+	}
 
 }

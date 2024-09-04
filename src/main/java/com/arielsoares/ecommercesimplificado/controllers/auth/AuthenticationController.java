@@ -31,13 +31,13 @@ public class AuthenticationController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO body) {
+	public ResponseEntity<ResponseDTO> register(@Valid @RequestBody RegisterRequestDTO body) {
 		String token = authenticationService.register(body.email(), body.username(), body.password());
-		return ResponseEntity.ok(token);
+		return ResponseEntity.ok(new ResponseDTO(body.email(), token));
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginRequestDTO body) {
+	public ResponseEntity<ResponseDTO> login(@RequestBody LoginRequestDTO body) {
 		String token = authenticationService.login(body.email(), body.password());
 		return ResponseEntity.ok(new ResponseDTO(body.email(), token));
 	}
