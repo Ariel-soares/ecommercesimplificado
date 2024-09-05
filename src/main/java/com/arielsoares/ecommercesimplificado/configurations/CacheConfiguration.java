@@ -10,17 +10,19 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Configuration
 @EnableCaching
 public class CacheConfiguration {
 
 	@Bean
-	RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+	RedisCacheManager cacheManager(RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
 		RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
 				.serializeKeysWith(
 						RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
 				.serializeValuesWith(RedisSerializationContext.SerializationPair
-						.fromSerializer(new GenericJackson2JsonRedisSerializer()));
+						.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)));
 
 		return RedisCacheManager.builder(redisConnectionFactory).cacheDefaults(cacheConfiguration).build();
 	}

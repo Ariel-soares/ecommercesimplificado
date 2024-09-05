@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.entities.enums.UserRole;
+import com.arielsoares.ecommercesimplificado.exception.InvalidArgumentException;
 import com.arielsoares.ecommercesimplificado.repositories.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -21,19 +22,19 @@ public class UserService {
 	public List<User> findAll() {
 		return repository.findAll();
 	}
-	
+
 	public User insert(User user) {
 		return repository.save(user);
 	}
 
 	public User findById(Long id) {
-		return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found with Id: " + id));
+		return repository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException("Product not found with Id: " + id));
 	}
 
 	public User registerUser(User user) {
 		if (this.repository.findByEmail(user.getEmail()).isPresent())
-			//Customizar excessão
-			throw new RuntimeException("Email already being used");
+			throw new InvalidArgumentException("Email already being used");
 		return repository.save(user);
 	}
 
@@ -52,7 +53,7 @@ public class UserService {
 		User newUser = findById(id);
 
 		if (newUser.getRole() == UserRole.ADMIN && operator.getRole() != UserRole.ADMIN)
-			throw new IllegalArgumentException("ADMIN users can only be modified by other ADMIN users");
+			throw new InvalidArgumentException("ADMIN users can only be modified by other ADMIN users");
 
 		newUser.setRole(UserRole.valueOf(role.toUpperCase()));
 		return updateUser(id, newUser);
@@ -64,19 +65,19 @@ public class UserService {
 		User newUser = findById(id);
 
 		if (newUser.getRole() == UserRole.ADMIN && operator.getRole() != UserRole.ADMIN)
-			throw new IllegalArgumentException("ADMIN users can only be modified by other ADMIN users");
+			throw new InvalidArgumentException("ADMIN users can only be modified by other ADMIN users");
 
 		newUser.setIs_active(false);
 		return updateUser(id, newUser);
 	}
-	
+
 	public User updateUser(Long Id, User user) {
 		User updatedUser = findById(Id);
 		updatedUser.setIs_active(user.getIs_active());
 		updatedUser.setPassword(user.getPassword());
 		updatedUser.setUsername(user.getUsername());
 		updatedUser.setRole(user.getRole());
-		
+
 		return repository.save(updatedUser);
 	}
 

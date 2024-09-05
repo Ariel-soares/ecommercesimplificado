@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.entities.utils.PasswordResetToken;
+import com.arielsoares.ecommercesimplificado.exception.InvalidArgumentException;
+import com.arielsoares.ecommercesimplificado.exception.InvalidTokenException;
 import com.arielsoares.ecommercesimplificado.infra.security.TokenService;
 import com.arielsoares.ecommercesimplificado.repositories.utils.PasswordResetTokenRepository;
 import com.arielsoares.ecommercesimplificado.services.UserService;
@@ -43,11 +45,11 @@ public class AuthenticationService {
 
 	public String register(String email, String username, String password) {
 
-		User newUser = new User();
+		User newUser = new User(email, username, password);
 		newUser.setEmail(email);
 		newUser.setUsername(username);
 		if (password.isBlank() || password == null)
-			throw new IllegalArgumentException("Password cannot be blank or empty");
+			throw new InvalidArgumentException("Password cannot be blank or empty");
 		newUser.setPassword(passwordEncoder.encode(password));
 
 		userService.registerUser(newUser);
@@ -86,11 +88,11 @@ public class AuthenticationService {
 
 		// Customizar excessão
 		if (resetToken == null || resetToken.isExpired()) {
-			throw new RuntimeException("INVALID TOKEN");
+			throw new InvalidTokenException("INVALID TOKEN");
 		}
 
 		if (newPassword.isBlank() || newPassword == null)
-			throw new IllegalArgumentException("Password cannot be blank or empty");
+			throw new InvalidArgumentException("Password cannot be blank or empty");
 
 		User user = resetToken.getUser();
 		user.setPassword(passwordEncoder.encode(newPassword));
