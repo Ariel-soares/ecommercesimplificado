@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderDTOWithoutClient;
 import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderItemDTO;
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.User;
@@ -44,8 +45,8 @@ public class OrderController {
 
 	// OK
 	@GetMapping(value = "/userOrders/{userId}")
-	public ResponseEntity<List<Order>> findByClientId(@PathVariable Long userId) {
-		return ResponseEntity.ok().body(service.findByClientId(userId));
+	public ResponseEntity<List<OrderDTOWithoutClient>> findByClientId(@PathVariable Long userId) {
+		return ResponseEntity.ok().body(service.findByClient(userId));
 	}
 
 	// OK

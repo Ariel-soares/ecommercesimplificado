@@ -1,11 +1,13 @@
 package com.arielsoares.ecommercesimplificado.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderDTOWithoutClient;
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.OrderItem;
 import com.arielsoares.ecommercesimplificado.entities.Product;
@@ -19,8 +21,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Service
 public class OrderService {
 
-	//FALTA REVISAR
-	
+	// FALTA REVISAR
+
 	private OrderRepository repository;
 	private OrderItemService orderItemService;
 	private ProductService productService;
@@ -40,12 +42,24 @@ public class OrderService {
 	}
 
 	public Order findById(Long orderId) {
-		return repository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
+		return repository.findById(orderId)
+				.orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 	}
 
-	@JsonIgnoreProperties(value = {"client"})
 	public List<Order> findByClientId(Long clientId) {
 		return repository.findByClientId(clientId);
+	}
+
+	public List<OrderDTOWithoutClient> findByClient(Long clientId) {
+		List<Order> orders = repository.findByClientId(clientId);
+		List<OrderDTOWithoutClient> orderDTOS = new ArrayList<>();
+
+		for (Order o : orders) {
+			OrderDTOWithoutClient orderDTO = new OrderDTOWithoutClient(o.getId(), o.getMoment(), o.getItems(),
+					o.getStatus());
+			orderDTOS.add(orderDTO);
+		}
+		return orderDTOS;
 	}
 
 	@CacheEvict(value = "orders", allEntries = true)
@@ -130,7 +144,7 @@ public class OrderService {
 			throw new IllegalArgumentException("Users can only modify their own orders");
 		Product product = productService.findById(productId);
 
-		//Analisar
+		// Analisar
 		OrderItem oi = new OrderItem(product, quantity);
 		for (OrderItem i : order.getItems()) {
 			if (i.getProduct() == oi.getProduct() && i.getActive()) {
@@ -138,14 +152,15 @@ public class OrderService {
 				return insert(order);
 			}
 		}
-		
-		 OrderItem newOi = orderItemService.insert(oi);
-		
+
+		OrderItem newOi = orderItemService.insert(oi);
+
 		order.getItems().add(newOi);
 		return insert(order);
 	}
 
-	// OK + Revisar mais tarde, Método Update do OrderItemService está indiscriminadamente inativando o OrderItem, ajeitar isso mais tarde
+	// OK + Revisar mais tarde, Método Update do OrderItemService está
+	// indiscriminadamente inativando o OrderItem, ajeitar isso mais tarde
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order inactiveOrderItem(Long userId, Long orderId, Long orderItemId) {
 
