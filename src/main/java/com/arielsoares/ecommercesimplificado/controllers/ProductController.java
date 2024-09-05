@@ -26,8 +26,6 @@ public class ProductController {
 	@Autowired
 	private ProductService service;
 
-	//Classe totalmente testada
-	
 	@GetMapping
 	public ResponseEntity<List<Product>> findAll() {
 		List<Product> list = service.findAll();

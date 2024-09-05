@@ -58,7 +58,7 @@ public class OrderController {
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
-	// Revisar
+	// Funciona perfeitamente, Orgulho do pai
 	@PostMapping(value = "/{orderId}/item")
 	public ResponseEntity<Order> addOrderItem(@RequestBody OrderItemDTO body, @PathVariable Long orderId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -68,7 +68,7 @@ public class OrderController {
 	}
 
 	// OK
-	@PutMapping(value = "/{orderId}/inactiveOrderItem/{orderItemId}")
+	@PutMapping(value = "/{orderId}/inactivateOrderItem/{orderItemId}")
 	public ResponseEntity<Order> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Order order = service.inactiveOrderItem(user.getId(), orderId, orderItemId);

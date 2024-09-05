@@ -3,6 +3,7 @@ package com.arielsoares.ecommercesimplificado.infra.security;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,10 +24,8 @@ public class SecurityFilter extends OncePerRequestFilter {
 
 	@Autowired
 	TokenService tokenService;
-
 	@Autowired
 	UserService userService;
-
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
 
@@ -39,12 +38,10 @@ public class SecurityFilter extends OncePerRequestFilter {
 			String email = tokenService.validateToken(token);
 
 			if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-				System.out.println("FILTER INTERNAL EMAIL: -> " + email);
 				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 				
-				//Ageitar mais tarde, isso é apenas uma quebra galho
 				if (!userDetails.isEnabled())
-					throw new RuntimeException("User not enabled");
+					throw new DisabledException("User not enabled");
 				
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
 						userDetails, null, userDetails.getAuthorities());

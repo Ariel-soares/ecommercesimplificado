@@ -2,12 +2,15 @@ package com.arielsoares.ecommercesimplificado.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+
+import com.auth0.jwt.exceptions.JWTCreationException;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -64,6 +67,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDetails> handleInvalidTokenException(InvalidTokenException ex) {
         ErrorDetails errorDetails = new ErrorDetails(HttpStatus.UNAUTHORIZED, "Invalid token", ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
+	
+	@ExceptionHandler(DisabledException.class)
+    public ResponseEntity<Object> handleDisabledException(DisabledException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+	
+	@ExceptionHandler(JWTCreationException.class)
+    public ResponseEntity<ErrorDetails> handleJWTCreationException(JWTCreationException ex) {
+        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.INTERNAL_SERVER_ERROR, "Error in creating token",ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

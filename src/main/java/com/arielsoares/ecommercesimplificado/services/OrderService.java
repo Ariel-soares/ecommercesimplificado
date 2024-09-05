@@ -3,7 +3,6 @@ package com.arielsoares.ecommercesimplificado.services;
 import java.util.List;
 
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +14,13 @@ import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.arielsoares.ecommercesimplificado.exception.InvalidArgumentException;
 import com.arielsoares.ecommercesimplificado.exception.ResourceNotFoundException;
 import com.arielsoares.ecommercesimplificado.repositories.OrderRepository;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Service
 public class OrderService {
 
+	//FALTA REVISAR
+	
 	private OrderRepository repository;
 	private OrderItemService orderItemService;
 	private ProductService productService;
@@ -37,12 +39,15 @@ public class OrderService {
 		return repository.findAll();
 	}
 
-	@Cacheable(value = "orders", key = "#orderId")
 	public Order findById(Long orderId) {
 		return repository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 	}
 
-	@CachePut(value = "orders", key = "#result.id")
+	@JsonIgnoreProperties(value = {"client"})
+	public List<Order> findByClientId(Long clientId) {
+		return repository.findByClientId(clientId);
+	}
+
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order insert(Order Order) {
 		return repository.save(Order);
@@ -54,7 +59,6 @@ public class OrderService {
 	}
 
 	// Refatorar no futuro -> Revisar antes da entrega
-	@CachePut(value = "orders", key = "#result.id")
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order update(Long userId, Long id, String status) {
 
@@ -80,6 +84,7 @@ public class OrderService {
 	}
 
 	// OK + Conferir se está atualizando o estoque do produto ao fechar a compra
+	@CacheEvict(value = "orders", allEntries = true)
 	private void completeOrder(Order obj) {
 
 		Integer quantity = 0;
@@ -111,8 +116,7 @@ public class OrderService {
 		obj.setStatus(OrderStatus.PAID);
 	}
 
-	// Refatorar -> Order não pode ser atualizada caso já esteja fechada ou paga
-	@CachePut(value = "orders", key = "#result.id")
+	// Conferir -> Order não pode ser atualizada caso já esteja fechada ou paga
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
 		Order order = findById(orderId);
@@ -123,26 +127,25 @@ public class OrderService {
 
 		User newUser = userService.findById(userId);
 		if (!newUser.getOrders().contains(order))
-			throw new RuntimeException();
+			throw new IllegalArgumentException("Users can only modify their own orders");
 		Product product = productService.findById(productId);
 
-		OrderItem oi = orderItemService.insert(new OrderItem(product, quantity));
+		//Analisar
+		OrderItem oi = new OrderItem(product, quantity);
 		for (OrderItem i : order.getItems()) {
-			if (i.getProduct() == oi.getProduct()) {
+			if (i.getProduct() == oi.getProduct() && i.getActive()) {
 				i.setQuantity(i.getQuantity() + quantity);
 				return insert(order);
 			}
 		}
-		order.getItems().add(oi);
+		
+		 OrderItem newOi = orderItemService.insert(oi);
+		
+		order.getItems().add(newOi);
 		return insert(order);
 	}
 
-	public List<Order> findByClientId(Long clientId) {
-		return repository.findByClientId(clientId);
-	}
-
-	// OK + Revisar mais tarde, ele funciona mas não sei o porquê
-	@CachePut(value = "orders", key = "#result.id")
+	// OK + Revisar mais tarde, Método Update do OrderItemService está indiscriminadamente inativando o OrderItem, ajeitar isso mais tarde
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order inactiveOrderItem(Long userId, Long orderId, Long orderItemId) {
 

@@ -26,24 +26,22 @@ public class ProductService {
 		return repository.findAll();
 	}
 
-	@Cacheable(value = "products", key = "#productId")
+	@CacheEvict(value = "products", key = "'allProducts'")
 	public Product findById(Long id) {
 		return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
 	}
 
-	@CachePut(value = "products", key = "#result.id")
-	@CacheEvict(value = "products", allEntries = true)
+	@CachePut(value = "products", key = "'allProducts'")
 	public Product insert(Product Product) {
 		return repository.save(Product);
 	}
 
-	@CacheEvict(value = "products", allEntries = true)
+	@CacheEvict(value = "products", key = "'allProducts'")
 	public void delete(Long id) {
 		repository.deleteById(id);
 	}
 
-	@CachePut(value = "products", key = "#result.id")
-	@CacheEvict(value = "products", allEntries = true)
+	@CachePut(value = "products", key = "'allProducts'")
 	public Product update(Long id, Product newProduct) {
 
 		Optional<Product> optionalProduct = repository.findById(id);
