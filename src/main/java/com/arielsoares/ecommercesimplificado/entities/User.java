@@ -13,6 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.arielsoares.ecommercesimplificado.entities.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -55,25 +56,28 @@ public class User implements Serializable, UserDetails {
 	@Email(message = "Email should be valid")
 	private String email;
 
-	@Column(name = "last_password_change_date")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
+	@Column(name = "last_generated_token")
 	private LocalDateTime lastGeneratedToken;
 
 	@Enumerated(EnumType.STRING)
 	private UserRole role = UserRole.CLIENT;
 
-	private Boolean is_active = true;
+	private Boolean is_active;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "client")
 	private List<Order> orders = new ArrayList<>();
 
 	public User() {
+		this.is_active = true;
 	}
 
 	public User(String username, String password, String email) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
+		this.is_active = true;
 	}
 
 	public Long getId() {

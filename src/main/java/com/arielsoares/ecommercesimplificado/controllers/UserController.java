@@ -43,7 +43,7 @@ public class UserController {
 		return ResponseEntity.ok().body(user);
 	}
 
-	//Ainda com problema
+	//Ainda com problema / Foi dado um jeito mas ainda não é o devido
 	@PutMapping(value = "/inactiveUser/{id}")
 	public ResponseEntity<User> inactivateUser(@PathVariable Long id) {
 		User operatorUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -10,6 +10,8 @@ import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,14 +39,17 @@ public class Order implements Serializable {
 	@OneToMany
 	private List<OrderItem> items = new ArrayList<>();
 	
-	private OrderStatus status = OrderStatus.WAITING_PAYMENT;
+	@Enumerated(EnumType.STRING)
+	private OrderStatus status;
 	
 	public Order() {
+		this.status = OrderStatus.OPEN;
 	}
 
 	public Order(User client) {
 		this.moment = Instant.now();
 		this.client = client;
+		this.status = OrderStatus.OPEN;
 	}
 
 	public Long getId() {

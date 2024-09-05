@@ -58,7 +58,7 @@ public class OrderController {
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
-	// Refatorar futuramente -> Por causa dos map, substituir por DTO
+	// Revisar
 	@PostMapping(value = "/{orderId}/item")
 	public ResponseEntity<Order> addOrderItem(@RequestBody OrderItemDTO body, @PathVariable Long orderId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -83,6 +83,7 @@ public class OrderController {
 		return ResponseEntity.ok().body(order);
 	}
 
+	//Criar método de deleção
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		service.delete(id);

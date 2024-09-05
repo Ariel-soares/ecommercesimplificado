@@ -28,6 +28,8 @@ public class AuthenticationService {
 	private TokenService tokenService;
 	private AuthenticationManager authenticationManager;
 
+	// CLASSE TOTALMENTE TESTADA
+
 	public AuthenticationService(UserService userService, PasswordResetTokenRepository tokenRepository,
 			PasswordEncoder passwordEncoder, EmailService mailService, TokenService tokenService,
 			AuthenticationManager authenticationManager) {
@@ -44,6 +46,8 @@ public class AuthenticationService {
 		User newUser = new User();
 		newUser.setEmail(email);
 		newUser.setUsername(username);
+		if (password.isBlank() || password == null)
+			throw new IllegalArgumentException("Password cannot be blank or empty");
 		newUser.setPassword(passwordEncoder.encode(password));
 
 		userService.registerUser(newUser);
@@ -67,8 +71,8 @@ public class AuthenticationService {
 
 		if (resetToken != null) {
 			String subject = "Password Reset Request";
-			String body = "Use the following token to reset your password on the endpoint: /reset-password/confirm\n"
-					+ resetToken;
+			String body = "Use the following token to reset your password on the endpoint:"
+					+ " /reset-password/confirm \n This token will expire in 24 hours" + resetToken;
 
 			mailService.sendSimpleEmail(email, subject, body);
 			return true;
@@ -80,24 +84,27 @@ public class AuthenticationService {
 	public String confirmResetPassword(String token, String newPassword) {
 		PasswordResetToken resetToken = tokenRepository.findByToken(token);
 
+		// Customizar excessão
 		if (resetToken == null || resetToken.isExpired()) {
 			throw new RuntimeException("INVALID TOKEN");
 		}
 
+		if (newPassword.isBlank() || newPassword == null)
+			throw new IllegalArgumentException("Password cannot be blank or empty");
+
 		User user = resetToken.getUser();
 		user.setPassword(passwordEncoder.encode(newPassword));
-		// Adicionar método update do UserService e então atualizar aqui a referência de
-		// método, para parar de usar o insert
-		userService.insert(user);
+
+		userService.updateUser(user.getId(), user);
 		tokenRepository.delete(resetToken);
 
 		String newToken = tokenService.generateToken(user.getEmail());
 
-		mailService.sendSimpleEmail(user.getEmail(), "Password Reset Successful",
+		mailService.sendSimpleEmail(user.getEmail(), "Password Reset Successfully",
 				"Your password has been reset successfully.");
 		return newToken;
 	}
-	
+
 	public String createPasswordResetToken(String email) {
 		User user = userService.findByEmail(email)
 				.orElseThrow(() -> new EntityNotFoundException("User not found for email: " + email));

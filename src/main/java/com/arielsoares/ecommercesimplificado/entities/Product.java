@@ -12,6 +12,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "tb_product")
@@ -23,7 +24,9 @@ public class Product implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotNull(message = "Name cannot be null")
 	@NotBlank(message = "Name is mandatory")
+	@Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
 	private String name;
 	private String description;
 	
@@ -32,6 +35,7 @@ public class Product implements Serializable {
 	@DecimalMax(value = "9999999999.99", message = "Price must be less than 10 billion")
 	private Double price;
 	
+
 	@NotNull(message = "There must be an initial quantity, even if it is 0")
 	private Integer storage_quantity;
 	private Boolean active = true;

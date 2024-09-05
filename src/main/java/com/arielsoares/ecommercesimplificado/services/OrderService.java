@@ -14,6 +14,7 @@ import com.arielsoares.ecommercesimplificado.entities.OrderItem;
 import com.arielsoares.ecommercesimplificado.entities.Product;
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
+import com.arielsoares.ecommercesimplificado.exception.ResourceNotFoundException;
 import com.arielsoares.ecommercesimplificado.repositories.OrderRepository;
 
 @Service
@@ -38,8 +39,7 @@ public class OrderService {
 
 	@Cacheable(value = "orders", key = "#orderId")
 	public Order findById(Long orderId) {
-		Optional<Order> obj = repository.findById(orderId);
-		return obj.orElseThrow(() -> new RuntimeException("Order not found for Id: " + orderId));
+		return repository.findById(orderId).orElseThrow(() -> new ResourceNotFoundException("Order not found with id " + orderId));
 	}
 
 	@CachePut(value = "orders", key = "#result.id")

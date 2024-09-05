@@ -23,6 +23,8 @@ public class AuthenticationController {
 	@Autowired
 	private AuthenticationService authenticationService;
 
+	//CLASSE TOTALMENTE TESTADA
+	
 	@PostMapping("/register")
 	public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body) {
 		String token = authenticationService.register(body.email(), body.username(), body.password());
@@ -41,14 +43,14 @@ public class AuthenticationController {
 		String email = request.get("email");
 
 		if (authenticationService.resetPassword(email))
-			return ResponseEntity.ok("Password reset e-mail sent to " + email);
+			return ResponseEntity.ok().build();
 		return ResponseEntity.badRequest().build();
 	}
 
 	@PostMapping("/reset-password/confirm")
 	public ResponseEntity<confirmResetResponseDTO> confirmResetPassword(@RequestBody ResetPasswordDTO body) {
 		String newToken = authenticationService.confirmResetPassword(body.token(), body.newPassword());
-		return ResponseEntity.ok(new confirmResetResponseDTO("ariel.sfranco@protonmail.com", newToken));
+		return ResponseEntity.ok(new confirmResetResponseDTO("Password reseted succesfully", newToken));
 	}
 
 }

@@ -2,11 +2,12 @@ package com.arielsoares.ecommercesimplificado.entities.enums;
 
 public enum OrderStatus {
 	
-	WAITING_PAYMENT(1),
-    PAID(2),
-    SHIPPED(3),
-    COMPLETE(4),
-    CANCELLED(5);
+	OPEN(1),
+	WAITING_PAYMENT(2),
+    PAID(3),
+    SHIPPED(4),
+    COMPLETE(5),
+    CANCELLED(6);
 
     private int code;
 
@@ -24,7 +25,7 @@ public enum OrderStatus {
                 return value;
             }
         }
-        throw new IllegalArgumentException("Código de status inválido");
+        throw new IllegalArgumentException("Invalid status code");
     }
 
 }

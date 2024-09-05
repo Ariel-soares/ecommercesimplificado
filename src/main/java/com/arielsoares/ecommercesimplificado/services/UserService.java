@@ -27,13 +27,13 @@ public class UserService {
 	}
 
 	public User findById(Long id) {
-		Optional<User> obj = repository.findById(id);
-		return obj.orElseThrow(() -> new EntityNotFoundException("Product not found"));
+		return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product not found with Id: " + id));
 	}
 
 	public User registerUser(User user) {
 		if (this.repository.findByEmail(user.getEmail()).isPresent())
-			throw new RuntimeException("Email already being used" + user.getEmail());
+			//Customizar excessão
+			throw new RuntimeException("Email already being used");
 		return repository.save(user);
 	}
 
@@ -55,10 +55,10 @@ public class UserService {
 			throw new IllegalArgumentException("ADMIN users can only be modified by other ADMIN users");
 
 		newUser.setRole(UserRole.valueOf(role.toUpperCase()));
-		return repository.save(newUser);
+		return updateUser(id, newUser);
 	}
 
-	// Conferir depois
+	// Conferir depois, não desativa usuário
 	public User inactivateUser(Long id, User operatorUser) {
 		User operator = findById(operatorUser.getId());
 		User newUser = findById(id);
@@ -67,7 +67,17 @@ public class UserService {
 			throw new IllegalArgumentException("ADMIN users can only be modified by other ADMIN users");
 
 		newUser.setIs_active(false);
-		return repository.save(newUser);
+		return updateUser(id, newUser);
+	}
+	
+	public User updateUser(Long Id, User user) {
+		User updatedUser = findById(Id);
+		updatedUser.setIs_active(user.getIs_active());
+		updatedUser.setPassword(user.getPassword());
+		updatedUser.setUsername(user.getUsername());
+		updatedUser.setRole(user.getRole());
+		
+		return repository.save(updatedUser);
 	}
 
 }

@@ -26,7 +26,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
 	@Autowired
 	UserService userService;
-	
+
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
 
@@ -34,19 +34,24 @@ public class SecurityFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		String token = request.getHeader("Authorization");
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-            String email = tokenService.validateToken(token);
+		if (token != null && token.startsWith("Bearer ")) {
+			token = token.substring(7);
+			String email = tokenService.validateToken(token);
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            	System.out.println("FILTER INTERNAL EMAIL: -> " + email);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
-        filterChain.doFilter(request, response);
+			if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+				System.out.println("FILTER INTERNAL EMAIL: -> " + email);
+				UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+				
+				//Ageitar mais tarde, isso é apenas uma quebra galho
+				if (!userDetails.isEnabled())
+					throw new RuntimeException("User not enabled");
+				
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+						userDetails, null, userDetails.getAuthorities());
+				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			}
+		}
+		filterChain.doFilter(request, response);
 	}
 }

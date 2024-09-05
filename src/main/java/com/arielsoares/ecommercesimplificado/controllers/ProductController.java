@@ -26,6 +26,8 @@ public class ProductController {
 	@Autowired
 	private ProductService service;
 
+	//Classe totalmente testada
+	
 	@GetMapping
 	public ResponseEntity<List<Product>> findAll() {
 		List<Product> list = service.findAll();
@@ -44,7 +46,7 @@ public class ProductController {
 		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(Product.getId()).toUri();
 		return ResponseEntity.created(uri).body(Product);
 	}
-	
+
 	@PutMapping(value = "/{id}")
 	public ResponseEntity<Product> update(@PathVariable Long id, @Valid @RequestBody Product product){
 		product = service.update(id, product);

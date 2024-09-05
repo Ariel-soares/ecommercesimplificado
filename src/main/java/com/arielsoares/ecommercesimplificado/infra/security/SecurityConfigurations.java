@@ -25,13 +25,15 @@ public class SecurityConfigurations {
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/auth/**").permitAll()
+				.authorizeHttpRequests(authorize -> authorize.requestMatchers("/auth/**").permitAll()
 						.requestMatchers(HttpMethod.DELETE, "/products/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.POST, "/products/**").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.PUT, "/products/**").hasRole("ADMIN")
 						.requestMatchers("/products/userOrders/**").hasAnyRole("USER", "ADMIN")
 						.requestMatchers("/users/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/orders/all").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/orders/userOrders/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/orders/**").hasRole("ADMIN")
 						.anyRequest().authenticated())
 				.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
