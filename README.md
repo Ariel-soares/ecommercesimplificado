@@ -5,7 +5,7 @@
 
 O projeto ecommercesimplificado é um projeto feito como resposta ao desafio 3 da UOL Compass
 
-O projeto consiste em um sistema de ecommeerce que cria, gere e atualiza vendas e usuários de um ecommerce.
+O projeto consiste em um sistema de ecommerce que cria, gere e atualiza vendas, produtos e usuários.
 
 # Tecnologias utilizadas
 - Java
