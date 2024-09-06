@@ -5,7 +5,7 @@
 
 O projeto ecommercesimplificado é um projeto feito como resposta ao desafio 3 da UOL Compass
 
-O projeto consiste em um sistema de ecommeerce que cria, gere e atualiza vendas e usuários de um ecommerce.
+O projeto consiste em um sistema de ecommerce que cria, gere e atualiza vendas, produtos e usuários.
 
 # Tecnologias utilizadas
 - Java
@@ -13,7 +13,7 @@ O projeto consiste em um sistema de ecommeerce que cria, gere e atualiza vendas 
 - Maven
 
 ## Modelo de domínio
-![Modelo-De-Cominio](https://github.com/Ariel-soares/Ajudando-o-Proximo/blob/main/assets/domain-model.jpg)
+![Modelo-De-Cominio](https://github.com/Ariel-soares/ecommercesimplificado/blob/main/assets/ecommercesimplificadoUML.jpeg)
 
 ## Implantação em produção
 - Banco de dados: MySQL
@@ -30,11 +30,7 @@ MySQL
 git clone https://github.com/Ariel-soares/Ajudando-o-Proximo
 ```
 
-2ºPasso: Entrar no arquivo persistence.xml e trocar o valor das propriedades "user" e "password" pelas credenciais de usuário do seu banco de dados
-
-![Persistence directory](https://github.com/Ariel-soares/Ajudando-o-Proximo/blob/main/assets/persistence-files.jpg)
-
-![DB-credentials](https://github.com/Ariel-soares/Ajudando-o-Proximo/blob/main/assets/DB-credentials.jpg)
+2ºPasso: Entrar no arquivo application.properties e trocar o valor das propriedades "user" e "password" pelas credenciais de usuário do seu banco de dados
 
 (Utilize MySQL para evitar problemas de compatibilidade).
 Mas caso queira trocar a base de dados para uma de sua escolha, basta retirar a dependência do MySQL no arquivo POM.xml e adicionar a de seu gosto.
