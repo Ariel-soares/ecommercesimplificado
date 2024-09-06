@@ -31,16 +31,11 @@ public class OrderController {
 
 	@Autowired
 	private OrderService service;
-	@Autowired
-	private OrderItemService oiService;
 
-	//OK
+	// OK
 	@GetMapping(value = "/all")
 	public ResponseEntity<List<Order>> findAll() {
 		List<Order> list = service.findAll();
-		
-		//oiService.delete(5L);
-		
 		return ResponseEntity.ok().body(list);
 	}
 
@@ -62,42 +57,34 @@ public class OrderController {
 	public ResponseEntity<OrderDTOWithoutClient> insert() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		OrderDTOWithoutClient newOrder = service.insert(new Order(user));
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.id())
-				.toUri();
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.id()).toUri();
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
 	// Funciona perfeitamente, Orgulho do pai
 	@PostMapping(value = "/{orderId}/item")
-	public ResponseEntity<OrderDTOWithoutClient> addOrderItem(@Valid @RequestBody OrderItemDTO body, @PathVariable Long orderId) {
+	public ResponseEntity<OrderDTOWithoutClient> addOrderItem(@Valid @RequestBody OrderItemDTO body,
+			@PathVariable Long orderId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		
-		OrderDTOWithoutClient orderDTO = service.addOrderItem(user.getId(), orderId, body.quantity(),
-				body.productId());
-		
+
+		OrderDTOWithoutClient orderDTO = service.addOrderItem(user.getId(), orderId, body.quantity(), body.productId());
+
 		return ResponseEntity.ok().body(orderDTO);
 	}
 
 	// OK
 	@PutMapping(value = "/{orderId}/inactivateOrderItem/{orderItemId}")
-	public ResponseEntity<Order> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
+	public ResponseEntity<OrderDTOWithoutClient> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Order order = service.inactiveOrderItem(user.getId(), orderId, orderItemId);
+		OrderDTOWithoutClient order = service.inactiveOrderItem(user.getId(), orderId, orderItemId);
 		return ResponseEntity.ok().body(order);
 	}
 
-	//OK
+	// OK + Aparentemente voltou a funcionar, mas é necessário continuar olhando
 	@PutMapping(value = "/{orderId}/orderStatus/{orderStatus}")
-	public ResponseEntity<Order> updateOrderStatus(@PathVariable Long orderId, @PathVariable String orderStatus) {
+	public ResponseEntity<OrderDTOWithoutClient> updateOrderStatus(@PathVariable Long orderId, @PathVariable String orderStatus) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Order order = service.update(user.getId(), orderId, orderStatus);
+		OrderDTOWithoutClient order = service.update(user.getId(), orderId, orderStatus);
 		return ResponseEntity.ok().body(order);
-	}
-
-	//Criar método de deleção
-	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		service.delete(id);
-		return ResponseEntity.noContent().build();
 	}
 }

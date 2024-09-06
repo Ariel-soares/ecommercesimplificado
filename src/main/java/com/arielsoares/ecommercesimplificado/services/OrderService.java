@@ -1,6 +1,7 @@
 package com.arielsoares.ecommercesimplificado.services;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -82,13 +83,14 @@ public class OrderService {
 		repository.deleteById(id);
 	}
 
+	@CacheEvict(value = "orders", allEntries = true)
 	public Order updateOrder(Order order) {
 		return repository.save(order);
 	}
 
 	// Refatorar no futuro -> Revisar antes da entrega
 	@CacheEvict(value = "orders", allEntries = true)
-	public Order update(Long userId, Long id, String status) {
+	public OrderDTOWithoutClient update(Long userId, Long id, String status) {
 
 		if (!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("PAID")
 				&& !status.toUpperCase().equals("WAITING_PAYMENT"))
@@ -112,10 +114,15 @@ public class OrderService {
 		if (status.toUpperCase().equals("CANCELLED"))
 			obj.setStatus(OrderStatus.CANCELLED);
 
-		return updateOrder(obj);
+		obj = updateOrder(obj);
+		
+		OrderDTOWithoutClient orderDTO = new OrderDTOWithoutClient(obj.getId(), obj.getMoment(),
+				obj.getItems(), obj.getStatus());
+		
+		return orderDTO;
 	}
 
-	// OK + Não exclui o OrderItem
+	// OK + Não exclui o OrderItem + Revisar
 	@CacheEvict(value = "orders", allEntries = true)
 	private void completeOrder(Order obj) {
 
@@ -134,20 +141,42 @@ public class OrderService {
 			if (!oi.getProduct().getActive() || !oi.getActive())
 				continue;
 			if (oi.getQuantity() > oi.getProduct().getStorage_quantity() || oi.getProduct().getStorage_quantity() == 0)
-				throw new InvalidArgumentException(
-						"Insuficient Storage Quantity of this product " + oi.getProduct().getName());
+				throw new InvalidArgumentException("Insuficient Storage Quantity of this product: "
+						+ oi.getProduct().getName() + " id: " + oi.getProduct().getId());
 		}
+		/*
+		 * for (OrderItem oi : obj.getItems()) { if (!oi.getProduct().getActive() ||
+		 * !oi.getActive()) { obj.getItems().remove(oi); updateOrder(obj);
+		 * orderItemService.delete(oi.getId()); continue; }
+		 * 
+		 * Product product = oi.getProduct();
+		 * 
+		 * System.out.println("Antigo estoque " + product.getStorage_quantity());
+		 * 
+		 * product.setStorage_quantity(product.getStorage_quantity() -
+		 * oi.getQuantity()); productService.update(product.getId(), product);
+		 * System.out.println("Novo estoque " + product.getStorage_quantity()); }
+		 * obj.setStatus(OrderStatus.PAID);
+		 */
+		Iterator<OrderItem> iterator = obj.getItems().iterator();
 
-		for (OrderItem oi : obj.getItems()) {
+		while (iterator.hasNext()) {
+			OrderItem oi = iterator.next();
+
 			if (!oi.getProduct().getActive() || !oi.getActive()) {
-				obj.getItems().remove(oi);
+				iterator.remove(); // Remova o item da lista de forma segura
+				updateOrder(obj);
 				orderItemService.delete(oi.getId());
-				continue;
-			}
+			} else {
+				Product product = oi.getProduct();
+				System.out.println("Antigo estoque " + product.getStorage_quantity());
 
-			Product product = oi.getProduct();
-			product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
-			productService.update(product.getId(), product);
+				// Decrementa o estoque apenas para os itens válidos
+				product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
+				productService.update(product.getId(), product);
+
+				System.out.println("Novo estoque " + product.getStorage_quantity());
+			}
 		}
 		obj.setStatus(OrderStatus.PAID);
 	}
@@ -194,7 +223,7 @@ public class OrderService {
 
 	// OK
 	@CacheEvict(value = "orders", allEntries = true)
-	public Order inactiveOrderItem(Long userId, Long orderId, Long orderItemId) {
+	public OrderDTOWithoutClient inactiveOrderItem(Long userId, Long orderId, Long orderItemId) {
 
 		List<Order> clientOrders = findByClientId(userId);
 		Order order = findById(orderId);
@@ -206,7 +235,13 @@ public class OrderService {
 				oi.setActive(false);
 			orderItemService.update(oi);
 		}
-		return findById(orderId);
+
+		Order updatedOrder = findById(orderId);
+
+		OrderDTOWithoutClient ordeDTO = new OrderDTOWithoutClient(updatedOrder.getId(), updatedOrder.getMoment(),
+				updatedOrder.getItems(), updatedOrder.getStatus());
+
+		return ordeDTO;
 	}
 
 }

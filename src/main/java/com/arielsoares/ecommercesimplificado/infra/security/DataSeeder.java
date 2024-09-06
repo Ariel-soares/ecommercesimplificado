@@ -1,6 +1,7 @@
 package com.arielsoares.ecommercesimplificado.infra.security;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
