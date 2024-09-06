@@ -1,5 +1,5 @@
 # ecommeercesimplificado
-[![NPM](https://img.shields.io/npm/l/react)](https://github.com/Ariel-soares/Desafio2/blob/main/LICENSE) 
+[![NPM](https://img.shields.io/npm/l/react)](https://github.com/Ariel-soares/ecommercesimplificado/blob/main/LICENSE) 
 
 # Sobre o projeto
 
