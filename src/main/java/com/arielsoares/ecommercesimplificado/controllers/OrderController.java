@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +19,6 @@ import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderDTOWithoutClie
 import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderItemDTO;
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.User;
-import com.arielsoares.ecommercesimplificado.services.OrderItemService;
 import com.arielsoares.ecommercesimplificado.services.OrderService;
 
 import jakarta.validation.Valid;
@@ -41,9 +39,9 @@ public class OrderController {
 
 	// OK
 	@GetMapping(value = "/myOrders")
-	public ResponseEntity<List<Order>> clientOrders() {
+	public ResponseEntity<List<OrderDTOWithoutClient>> clientOrders() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		return ResponseEntity.ok().body(service.findByClientId(user.getId()));
+		return ResponseEntity.ok().body(service.findByClient(user.getId()));
 	}
 
 	// OK
@@ -66,15 +64,14 @@ public class OrderController {
 	public ResponseEntity<OrderDTOWithoutClient> addOrderItem(@Valid @RequestBody OrderItemDTO body,
 			@PathVariable Long orderId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
 		OrderDTOWithoutClient orderDTO = service.addOrderItem(user.getId(), orderId, body.quantity(), body.productId());
-
 		return ResponseEntity.ok().body(orderDTO);
 	}
 
 	// OK
 	@PutMapping(value = "/{orderId}/inactivateOrderItem/{orderItemId}")
-	public ResponseEntity<OrderDTOWithoutClient> inactiveOrderItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
+	public ResponseEntity<OrderDTOWithoutClient> inactiveOrderItem(@PathVariable Long orderId,
+			@PathVariable Long orderItemId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		OrderDTOWithoutClient order = service.inactiveOrderItem(user.getId(), orderId, orderItemId);
 		return ResponseEntity.ok().body(order);
@@ -82,7 +79,8 @@ public class OrderController {
 
 	// OK + Aparentemente voltou a funcionar, mas é necessário continuar olhando
 	@PutMapping(value = "/{orderId}/orderStatus/{orderStatus}")
-	public ResponseEntity<OrderDTOWithoutClient> updateOrderStatus(@PathVariable Long orderId, @PathVariable String orderStatus) {
+	public ResponseEntity<OrderDTOWithoutClient> updateOrderStatus(@PathVariable Long orderId,
+			@PathVariable String orderStatus) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		OrderDTOWithoutClient order = service.update(user.getId(), orderId, orderStatus);
 		return ResponseEntity.ok().body(order);

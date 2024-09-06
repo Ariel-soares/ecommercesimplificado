@@ -1,7 +1,6 @@
 package com.arielsoares.ecommercesimplificado.services;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.cache.annotation.CacheEvict;
@@ -135,8 +134,6 @@ public class OrderService {
 		if (quantity < 1)
 			throw new InvalidArgumentException("Order can only be completed if it has at least 1 active Item");
 
-		// Confere se todos os items pedem menos que o do estoque + Refatorar para
-		// devolver todos os OrderItem que não estão condizentes
 		for (OrderItem oi : obj.getItems()) {
 			if (!oi.getProduct().getActive() || !oi.getActive())
 				continue;
@@ -144,41 +141,25 @@ public class OrderService {
 				throw new InvalidArgumentException("Insuficient Storage Quantity of this product: "
 						+ oi.getProduct().getName() + " id: " + oi.getProduct().getId());
 		}
-		/*
-		 * for (OrderItem oi : obj.getItems()) { if (!oi.getProduct().getActive() ||
-		 * !oi.getActive()) { obj.getItems().remove(oi); updateOrder(obj);
-		 * orderItemService.delete(oi.getId()); continue; }
-		 * 
-		 * Product product = oi.getProduct();
-		 * 
-		 * System.out.println("Antigo estoque " + product.getStorage_quantity());
-		 * 
-		 * product.setStorage_quantity(product.getStorage_quantity() -
-		 * oi.getQuantity()); productService.update(product.getId(), product);
-		 * System.out.println("Novo estoque " + product.getStorage_quantity()); }
-		 * obj.setStatus(OrderStatus.PAID);
-		 */
-		Iterator<OrderItem> iterator = obj.getItems().iterator();
+		List<OrderItem> itemsToRemove = new ArrayList<>();
 
-		while (iterator.hasNext()) {
-			OrderItem oi = iterator.next();
+		for (OrderItem oi : obj.getItems()) {
+		    if (!oi.getProduct().getActive() || !oi.getActive()) {
+		        itemsToRemove.add(oi);
+		        orderItemService.delete(oi.getId());
+		    } else {
+		        Product product = oi.getProduct();
 
-			if (!oi.getProduct().getActive() || !oi.getActive()) {
-				iterator.remove(); // Remova o item da lista de forma segura
-				updateOrder(obj);
-				orderItemService.delete(oi.getId());
-			} else {
-				Product product = oi.getProduct();
-				System.out.println("Antigo estoque " + product.getStorage_quantity());
-
-				// Decrementa o estoque apenas para os itens válidos
-				product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
-				productService.update(product.getId(), product);
-
-				System.out.println("Novo estoque " + product.getStorage_quantity());
-			}
+		        product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
+		        productService.update(product.getId(), product);
+		    }
 		}
+
+
+		obj.getItems().removeAll(itemsToRemove);
+
 		obj.setStatus(OrderStatus.PAID);
+		updateOrder(obj);
 	}
 
 	// Conferir -> Order não pode ser atualizada caso já esteja fechada ou paga
@@ -229,6 +210,10 @@ public class OrderService {
 		Order order = findById(orderId);
 		if (!clientOrders.contains(order))
 			throw new InvalidArgumentException("Client can update only their own orders");
+		
+		OrderItem orderItem = orderItemService.findById(orderItemId);
+		
+		if(orderItem.getActive() == false) throw new InvalidArgumentException("Order item is already inactive");
 
 		for (OrderItem oi : order.getItems()) {
 			if (oi.getId() == orderItemId)
