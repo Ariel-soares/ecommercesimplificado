@@ -27,7 +27,7 @@ public class OrderItemService {
 		return repository.save(OrderItem);
 	}
 
-	// Não apaga os Order Items
+	// Não apaga os Order Items + adcionar CascadeType
 	public void delete(Long id) {
 		repository.deleteById(id);
 	}

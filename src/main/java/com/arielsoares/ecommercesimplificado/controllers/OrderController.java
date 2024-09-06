@@ -39,7 +39,7 @@ public class OrderController {
 	public ResponseEntity<List<Order>> findAll() {
 		List<Order> list = service.findAll();
 		
-		oiService.delete(5L);
+		//oiService.delete(5L);
 		
 		return ResponseEntity.ok().body(list);
 	}
