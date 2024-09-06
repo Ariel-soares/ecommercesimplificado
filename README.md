@@ -13,7 +13,7 @@ O projeto consiste em um sistema de ecommeerce que cria, gere e atualiza vendas 
 - Maven
 
 ## Modelo de domínio
-![Modelo-De-Cominio](https://github.com/Ariel-soares/Ajudando-o-Proximo/blob/main/assets/domain-model.jpg)
+![Modelo-De-Cominio](https://github.com/Ariel-soares/ecommercesimplificado/blob/main/assets/ecommercesimplificadoUML.jpeg)
 
 ## Implantação em produção
 - Banco de dados: MySQL
