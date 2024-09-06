@@ -140,6 +140,7 @@ public class OrderService {
 
 		for (OrderItem oi : obj.getItems()) {
 			if (!oi.getProduct().getActive() || !oi.getActive()) {
+				obj.getItems().remove(oi);
 				orderItemService.delete(oi.getId());
 				continue;
 			}

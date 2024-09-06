@@ -20,6 +20,7 @@ import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderDTOWithoutClie
 import com.arielsoares.ecommercesimplificado.controllers.DTO.OrderItemDTO;
 import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.User;
+import com.arielsoares.ecommercesimplificado.services.OrderItemService;
 import com.arielsoares.ecommercesimplificado.services.OrderService;
 
 import jakarta.validation.Valid;
@@ -30,11 +31,16 @@ public class OrderController {
 
 	@Autowired
 	private OrderService service;
+	@Autowired
+	private OrderItemService oiService;
 
 	//OK
 	@GetMapping(value = "/all")
 	public ResponseEntity<List<Order>> findAll() {
 		List<Order> list = service.findAll();
+		
+		oiService.delete(5L);
+		
 		return ResponseEntity.ok().body(list);
 	}
 

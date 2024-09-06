@@ -3,6 +3,7 @@ package com.arielsoares.ecommercesimplificado.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,7 +24,7 @@ public class OrderItem implements Serializable {
 	private Integer quantity;
 	private Boolean active = true;
 	
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "product_id", nullable = false)
 	private Product product;
 

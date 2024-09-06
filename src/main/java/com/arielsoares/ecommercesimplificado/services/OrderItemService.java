@@ -27,6 +27,7 @@ public class OrderItemService {
 		return repository.save(OrderItem);
 	}
 
+	// Não apaga os Order Items
 	public void delete(Long id) {
 		repository.deleteById(id);
 	}

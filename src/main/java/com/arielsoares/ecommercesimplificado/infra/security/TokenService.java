@@ -1,5 +1,6 @@
 package com.arielsoares.ecommercesimplificado.infra.security;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -17,6 +18,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 
 @Service
 public class TokenService {
@@ -57,6 +59,13 @@ public class TokenService {
 			String email = JWT.require(algorithm).withIssuer("ecommercesimplificado").build().verify(token)
 					.getSubject();
 
+			Instant expirationDate = JWT.require(algorithm).withIssuer("ecommercesimplificado").build().verify(token)
+					.getExpiresAt().toInstant();
+
+			if (expirationDate.isBefore(Instant.now())) {
+				throw new TokenExpiredException("Token has expired", expirationDate);
+			}
+
 			User user = userService.findByEmail(email)
 					.orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
@@ -67,8 +76,9 @@ public class TokenService {
 			}
 
 			return JWT.require(algorithm).withIssuer("ecommercesimplificado").build().verify(token).getSubject();
-		} catch (JWTVerificationException exception) {
-			return "";
+
+		} catch (JWTVerificationException ex) {
+			throw new JWTVerificationException("Invalid token");
 		}
 	}
 
