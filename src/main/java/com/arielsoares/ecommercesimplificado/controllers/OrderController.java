@@ -22,6 +22,8 @@ import com.arielsoares.ecommercesimplificado.entities.Order;
 import com.arielsoares.ecommercesimplificado.entities.User;
 import com.arielsoares.ecommercesimplificado.services.OrderService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/orders")
 public class OrderController {
@@ -51,21 +53,23 @@ public class OrderController {
 
 	// OK
 	@PostMapping(value = "/newOrder")
-	public ResponseEntity<Order> insert() {
+	public ResponseEntity<OrderDTOWithoutClient> insert() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Order newOrder = service.insert(new Order(user));
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.getId())
+		OrderDTOWithoutClient newOrder = service.insert(new Order(user));
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(newOrder.id())
 				.toUri();
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
 	// Funciona perfeitamente, Orgulho do pai
 	@PostMapping(value = "/{orderId}/item")
-	public ResponseEntity<Order> addOrderItem(@RequestBody OrderItemDTO body, @PathVariable Long orderId) {
+	public ResponseEntity<OrderDTOWithoutClient> addOrderItem(@Valid @RequestBody OrderItemDTO body, @PathVariable Long orderId) {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		Order order = service.addOrderItem(user.getId(), orderId, body.quantity(),
+		
+		OrderDTOWithoutClient orderDTO = service.addOrderItem(user.getId(), orderId, body.quantity(),
 				body.productId());
-		return ResponseEntity.ok().body(order);
+		
+		return ResponseEntity.ok().body(orderDTO);
 	}
 
 	// OK

@@ -31,10 +31,8 @@ public class OrderItemService {
 		repository.deleteById(id);
 	}
 
-	public OrderItem update(Long id) {
-		OrderItem obj = findById(id);
-		obj.setActive(false);
-		return repository.save(obj);
+	public OrderItem update(OrderItem oi) {
+		return repository.save(oi);
 	}
 
 }

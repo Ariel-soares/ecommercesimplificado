@@ -2,9 +2,11 @@ package com.arielsoares.ecommercesimplificado.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -56,28 +58,45 @@ public class GlobalExceptionHandler {
 
 		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.NOT_FOUND, "User not found", ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
-    }
-	
+	public ResponseEntity<ErrorDetails> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+		ErrorDetails errorDetails = new ErrorDetails(HttpStatus.NOT_FOUND, "User not found", ex.getMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+	}
+
 	@ExceptionHandler(InvalidTokenException.class)
-    public ResponseEntity<ErrorDetails> handleInvalidTokenException(InvalidTokenException ex) {
-        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.UNAUTHORIZED, "Invalid token", ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
-    }
-	
+	public ResponseEntity<ErrorDetails> handleInvalidTokenException(InvalidTokenException ex) {
+		ErrorDetails errorDetails = new ErrorDetails(HttpStatus.UNAUTHORIZED, "Invalid token", ex.getMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+	}
+
 	@ExceptionHandler(DisabledException.class)
-    public ResponseEntity<Object> handleDisabledException(DisabledException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
-    }
-	
+	public ResponseEntity<Object> handleDisabledException(DisabledException ex) {
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+	}
+
 	@ExceptionHandler(JWTCreationException.class)
-    public ResponseEntity<ErrorDetails> handleJWTCreationException(JWTCreationException ex) {
-        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.INTERNAL_SERVER_ERROR, "Error in creating token",ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+	public ResponseEntity<ErrorDetails> handleJWTCreationException(JWTCreationException ex) {
+		ErrorDetails errorDetails = new ErrorDetails(HttpStatus.INTERNAL_SERVER_ERROR, "Error in creating token",
+				ex.getMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ExceptionHandler(HttpMessageNotReadableException.class)
+	public ResponseEntity<ErrorDetails> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex,
+			WebRequest request) {
+		String errorMessage = "The request body is not readable. Please check the format of your request.";
+		ErrorDetails errorDetails = new ErrorDetails(HttpStatus.BAD_REQUEST, errorMessage, ex.getMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorDetails> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        String errorMessage = "O método " + ex.getMethod() + " não é suportado para esta rota. Os métodos suportados são: " 
+                + ex.getSupportedHttpMethods();
+        ErrorDetails errorDetails = new ErrorDetails(HttpStatus.METHOD_NOT_ALLOWED, errorMessage, ex.getMessage());
+        return new ResponseEntity<>(errorDetails, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
 }

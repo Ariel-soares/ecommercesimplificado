@@ -16,7 +16,6 @@ import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.arielsoares.ecommercesimplificado.exception.InvalidArgumentException;
 import com.arielsoares.ecommercesimplificado.exception.ResourceNotFoundException;
 import com.arielsoares.ecommercesimplificado.repositories.OrderRepository;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Service
 public class OrderService {
@@ -63,21 +62,37 @@ public class OrderService {
 	}
 
 	@CacheEvict(value = "orders", allEntries = true)
-	public Order insert(Order Order) {
-		return repository.save(Order);
+	public OrderDTOWithoutClient insert(Order Order) {
+
+		Order newOrder = repository.save(Order);
+
+		OrderDTOWithoutClient order = new OrderDTOWithoutClient(newOrder.getId(), newOrder.getMoment(),
+				newOrder.getItems(), newOrder.getStatus());
+
+		return order;
 	}
 
 	@CacheEvict(value = "orders", allEntries = true)
 	public void delete(Long id) {
+		Order order = findById(id);
+
+		if (order.getStatus() != OrderStatus.OPEN || order.getStatus() != OrderStatus.WAITING_PAYMENT)
+			throw new InvalidArgumentException("Order cannot be deleted because it is already " + order.getStatus());
+
 		repository.deleteById(id);
+	}
+
+	public Order updateOrder(Order order) {
+		return repository.save(order);
 	}
 
 	// Refatorar no futuro -> Revisar antes da entrega
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order update(Long userId, Long id, String status) {
 
-		if (!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("PAID"))
-			throw new InvalidArgumentException("Only CANCELLED status or PAID STATUS ACCEPTED ");
+		if (!status.toUpperCase().equals("CANCELLED") && !status.toUpperCase().equals("PAID")
+				&& !status.toUpperCase().equals("WAITING_PAYMENT"))
+			throw new InvalidArgumentException("Only CANCELLED status, WAITING_PAYMENT or PAID status accepted ");
 
 		List<Order> clientOrders = findByClientId(userId);
 		Order obj = findById(id);
@@ -91,13 +106,16 @@ public class OrderService {
 		if (status.toUpperCase().equals("PAID"))
 			completeOrder(obj);
 
+		if (status.toUpperCase().equals("WAITING_PAYMENT"))
+			obj.setStatus(OrderStatus.WAITING_PAYMENT);
+
 		if (status.toUpperCase().equals("CANCELLED"))
 			obj.setStatus(OrderStatus.CANCELLED);
 
-		return insert(obj);
+		return updateOrder(obj);
 	}
 
-	// OK + Conferir se está atualizando o estoque do produto ao fechar a compra
+	// OK + Não exclui o OrderItem
 	@CacheEvict(value = "orders", allEntries = true)
 	private void completeOrder(Order obj) {
 
@@ -121,8 +139,11 @@ public class OrderService {
 		}
 
 		for (OrderItem oi : obj.getItems()) {
-			if (!oi.getProduct().getActive() || !oi.getActive())
+			if (!oi.getProduct().getActive() || !oi.getActive()) {
+				orderItemService.delete(oi.getId());
 				continue;
+			}
+
 			Product product = oi.getProduct();
 			product.setStorage_quantity(product.getStorage_quantity() - oi.getQuantity());
 			productService.update(product.getId(), product);
@@ -132,7 +153,7 @@ public class OrderService {
 
 	// Conferir -> Order não pode ser atualizada caso já esteja fechada ou paga
 	@CacheEvict(value = "orders", allEntries = true)
-	public Order addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
+	public OrderDTOWithoutClient addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
 		Order order = findById(orderId);
 
 		if (order.getStatus() == OrderStatus.PAID || order.getStatus() == OrderStatus.COMPLETE
@@ -149,18 +170,28 @@ public class OrderService {
 		for (OrderItem i : order.getItems()) {
 			if (i.getProduct() == oi.getProduct() && i.getActive()) {
 				i.setQuantity(i.getQuantity() + quantity);
-				return insert(order);
+
+				OrderDTOWithoutClient orderDTO = new OrderDTOWithoutClient(order.getId(), order.getMoment(),
+						order.getItems(), order.getStatus());
+
+				order = updateOrder(order);
+
+				return orderDTO;
 			}
 		}
 
 		OrderItem newOi = orderItemService.insert(oi);
 
 		order.getItems().add(newOi);
-		return insert(order);
+
+		order = updateOrder(order);
+
+		OrderDTOWithoutClient orderDTO2 = new OrderDTOWithoutClient(order.getId(), order.getMoment(), order.getItems(),
+				order.getStatus());
+		return orderDTO2;
 	}
 
-	// OK + Revisar mais tarde, Método Update do OrderItemService está
-	// indiscriminadamente inativando o OrderItem, ajeitar isso mais tarde
+	// OK
 	@CacheEvict(value = "orders", allEntries = true)
 	public Order inactiveOrderItem(Long userId, Long orderId, Long orderItemId) {
 
@@ -171,7 +202,8 @@ public class OrderService {
 
 		for (OrderItem oi : order.getItems()) {
 			if (oi.getId() == orderItemId)
-				orderItemService.update(orderItemId);
+				oi.setActive(false);
+			orderItemService.update(oi);
 		}
 		return findById(orderId);
 	}

@@ -9,6 +9,7 @@ import java.util.Objects;
 import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -36,12 +37,12 @@ public class Order implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
 	private User client;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<OrderItem> items = new ArrayList<>();
 	
 	@Enumerated(EnumType.STRING)
 	private OrderStatus status;
-	
+
 	public Order() {
 		this.status = OrderStatus.OPEN;
 	}
@@ -72,14 +73,6 @@ public class Order implements Serializable {
 		return items;
 	}
 
-	public Double getTotal() {
-		Double total = 0.0;
-		for (OrderItem item : items) {
-			if(item.getActive() == true)total += item.getSubTotal();
-		}
-		return total;
-	}
-
 	public User getClient() {
 		return client;
 	}
@@ -96,6 +89,14 @@ public class Order implements Serializable {
 		this.status = status;
 	}
 
+	public Double getTotal() {
+		Double total = 0.0;
+		for (OrderItem item : items) {
+			if(item.getActive() == true)total += item.getSubTotal();
+		}
+		return total;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)

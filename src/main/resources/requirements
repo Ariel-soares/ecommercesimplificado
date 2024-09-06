@@ -12,7 +12,6 @@ diretamente e venha atualizada. PESO (1)
 [X] Todas as EXCEÇÕES devem ser tratadas e seguir o mesmo padrão de resposta.
 PESO (1) -: Importância nível 2 daqui pra frente / Aparentemente pronto
 
-HTTPMessageNotReadable exception
 ExpiredJWTException
 MalformedJwtException
 SignatureException
