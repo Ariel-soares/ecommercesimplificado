@@ -4,13 +4,13 @@
 [X] Controlar o estoque do produto de forma que ele não possa ser vendido caso o
 estoque seja menor do que a quantidade necessária para a venda ou igual azero. PESO (3)
 [X] Permitir que os usuários criem, leiam, atualizem e excluam vendas (Uma venda tem que ter no mínimo 1 produto para ser concluída). PESO (3)
-[] Criar métodos de relatório de vendas por data (informada pelo cliente), por mês e pela semana atual (considerar dias úteis). PESO (1)
+[X] Criar métodos de relatório de vendas por data (informada pelo cliente), por mês e pela semana atual (considerar dias úteis). PESO (1)
 [X] Os métodos “GET ALL” de Produtos e Vendas devem salvar as informações no CACHE da aplicação, para que as próximas buscas sejam mais rápidas. Deve
 ser feito um bom gerenciamento do cache, por exemplo: ao inserir uma nova
 venda, deletar o cache, para que a informação seja buscada no banco de dados
 diretamente e venha atualizada. PESO (1)
 [X] Todas as EXCEÇÕES devem ser tratadas e seguir o mesmo padrão de resposta.
-PESO (1) -: Importância nível 2 daqui pra frente / Aparentemente pronto
+PESO (1) /Aparentemente pronto
 
 ExpiredJWTException
 MalformedJwtException

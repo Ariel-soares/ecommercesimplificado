@@ -121,8 +121,8 @@ public class OrderService {
 		return orderDTO;
 	}
 
-	// OK + Não exclui o OrderItem + Revisar
-	@CacheEvict(value = "orders", allEntries = true)
+	// OK
+	@CacheEvict(value = {"orders", "products"}, allEntries = true)
 	private void completeOrder(Order obj) {
 
 		Integer quantity = 0;
@@ -162,13 +162,13 @@ public class OrderService {
 		updateOrder(obj);
 	}
 
-	// Conferir -> Order não pode ser atualizada caso já esteja fechada ou paga
+	// OK
 	@CacheEvict(value = "orders", allEntries = true)
 	public OrderDTOWithoutClient addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
 		Order order = findById(orderId);
 
 		if (order.getStatus() == OrderStatus.PAID || order.getStatus() == OrderStatus.COMPLETE
-				|| order.getStatus() == OrderStatus.CANCELLED)
+				|| order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.WAITING_PAYMENT)
 			throw new InvalidArgumentException("Order is already " + order.getStatus());
 
 		User newUser = userService.findById(userId);
@@ -176,7 +176,6 @@ public class OrderService {
 			throw new IllegalArgumentException("Users can only modify their own orders");
 		Product product = productService.findById(productId);
 
-		// Analisar
 		OrderItem oi = new OrderItem(product, quantity);
 		for (OrderItem i : order.getItems()) {
 			if (i.getProduct() == oi.getProduct() && i.getActive()) {
