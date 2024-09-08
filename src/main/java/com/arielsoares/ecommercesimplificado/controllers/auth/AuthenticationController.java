@@ -23,8 +23,6 @@ public class AuthenticationController {
 	@Autowired
 	private AuthenticationService authenticationService;
 
-	//CLASSE TOTALMENTE TESTADA
-	
 	@PostMapping("/register")
 	public ResponseEntity<ResponseDTO> register(@RequestBody RegisterRequestDTO body) {
 		String token = authenticationService.register(body.email(), body.username(), body.password());

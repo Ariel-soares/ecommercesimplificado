@@ -29,8 +29,6 @@ public class DataSeeder implements CommandLineRunner {
             admin.setRole(UserRole.ADMIN);
             admin.setIs_active(true);
             userRepository.save(admin);
-
-            System.out.println("Admin user created with email: admin@example.com");
         }
     }
 }

@@ -30,27 +30,23 @@ public class OrderController {
 	@Autowired
 	private OrderService service;
 
-	// OK
 	@GetMapping(value = "/all")
 	public ResponseEntity<List<Order>> findAll() {
 		List<Order> list = service.findAll();
 		return ResponseEntity.ok().body(list);
 	}
 
-	// OK
 	@GetMapping(value = "/myOrders")
 	public ResponseEntity<List<OrderDTOWithoutClient>> clientOrders() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		return ResponseEntity.ok().body(service.findByClient(user.getId()));
 	}
 
-	// OK
 	@GetMapping(value = "/userOrders/{userId}")
 	public ResponseEntity<List<OrderDTOWithoutClient>> findByClientId(@PathVariable Long userId) {
 		return ResponseEntity.ok().body(service.findByClient(userId));
 	}
 
-	// OK
 	@PostMapping(value = "/newOrder")
 	public ResponseEntity<OrderDTOWithoutClient> insert() {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -59,7 +55,6 @@ public class OrderController {
 		return ResponseEntity.created(uri).body(newOrder);
 	}
 
-	// Funciona perfeitamente, Orgulho do pai
 	@PostMapping(value = "/{orderId}/item")
 	public ResponseEntity<OrderDTOWithoutClient> addOrderItem(@Valid @RequestBody OrderItemDTO body,
 			@PathVariable Long orderId) {
@@ -68,7 +63,6 @@ public class OrderController {
 		return ResponseEntity.ok().body(orderDTO);
 	}
 
-	// OK
 	@PutMapping(value = "/{orderId}/inactivateOrderItem/{orderItemId}")
 	public ResponseEntity<OrderDTOWithoutClient> inactiveOrderItem(@PathVariable Long orderId,
 			@PathVariable Long orderItemId) {
@@ -77,7 +71,6 @@ public class OrderController {
 		return ResponseEntity.ok().body(order);
 	}
 
-	// OK + Aparentemente voltou a funcionar, mas é necessário continuar olhando
 	@PutMapping(value = "/{orderId}/orderStatus/{orderStatus}")
 	public ResponseEntity<OrderDTOWithoutClient> updateOrderStatus(@PathVariable Long orderId,
 			@PathVariable String orderStatus) {

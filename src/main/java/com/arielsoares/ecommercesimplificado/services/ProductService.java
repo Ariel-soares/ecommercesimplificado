@@ -53,6 +53,7 @@ public class ProductService {
 			product.setDescription(newProduct.getDescription());
 			product.setPrice(newProduct.getPrice());
 			product.setStorage_quantity(newProduct.getStorage_quantity());
+			product.setActive(newProduct.getActive());
 
 			return repository.save(product);
 		} else {

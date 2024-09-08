@@ -16,23 +16,24 @@ import com.arielsoares.ecommercesimplificado.entities.enums.OrderStatus;
 import com.arielsoares.ecommercesimplificado.exception.InvalidArgumentException;
 import com.arielsoares.ecommercesimplificado.exception.ResourceNotFoundException;
 import com.arielsoares.ecommercesimplificado.repositories.OrderRepository;
+import com.arielsoares.ecommercesimplificado.services.mail.EmailService;
 
 @Service
 public class OrderService {
-
-	// FALTA REVISAR
 
 	private OrderRepository repository;
 	private OrderItemService orderItemService;
 	private ProductService productService;
 	private UserService userService;
+	private EmailService mailService;
 
 	public OrderService(OrderRepository repository, OrderItemService orderItemService, ProductService productService,
-			UserService userService) {
+			UserService userService, EmailService mailService) {
 		this.repository = repository;
 		this.orderItemService = orderItemService;
 		this.productService = productService;
 		this.userService = userService;
+		this.mailService = mailService;
 	}
 
 	@Cacheable(value = "orders")
@@ -87,7 +88,6 @@ public class OrderService {
 		return repository.save(order);
 	}
 
-	// Refatorar no futuro -> Revisar antes da entrega
 	@CacheEvict(value = "orders", allEntries = true)
 	public OrderDTOWithoutClient update(Long userId, Long id, String status) {
 
@@ -121,7 +121,6 @@ public class OrderService {
 		return orderDTO;
 	}
 
-	// OK
 	@CacheEvict(value = {"orders", "products"}, allEntries = true)
 	private void completeOrder(Order obj) {
 
@@ -132,7 +131,7 @@ public class OrderService {
 			quantity += 1;
 		}
 		if (quantity < 1)
-			throw new InvalidArgumentException("Order can only be completed if it has at least 1 active Item");
+			throw new InvalidArgumentException("Order can only be completed if it has at least 1 active Item and Product");
 
 		for (OrderItem oi : obj.getItems()) {
 			if (!oi.getProduct().getActive() || !oi.getActive())
@@ -156,13 +155,19 @@ public class OrderService {
 		}
 
 
+		String email = obj.getClient().getEmail();
+		
 		obj.getItems().removeAll(itemsToRemove);
 
 		obj.setStatus(OrderStatus.PAID);
 		updateOrder(obj);
+		
+		String subject = "Order Completed";
+		String body = "Thank you for buying with us, we received your payment with the value of R$" + obj.getTotal();
+
+		mailService.sendSimpleEmail(email, subject, body);
 	}
 
-	// OK
 	@CacheEvict(value = "orders", allEntries = true)
 	public OrderDTOWithoutClient addOrderItem(Long userId, Long orderId, Integer quantity, Long productId) {
 		Order order = findById(orderId);
@@ -201,7 +206,6 @@ public class OrderService {
 		return orderDTO2;
 	}
 
-	// OK
 	@CacheEvict(value = "orders", allEntries = true)
 	public OrderDTOWithoutClient inactiveOrderItem(Long userId, Long orderId, Long orderItemId) {
 

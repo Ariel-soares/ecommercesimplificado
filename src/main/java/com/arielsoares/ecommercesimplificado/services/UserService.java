@@ -59,7 +59,6 @@ public class UserService {
 		return updateUser(id, newUser);
 	}
 
-	// Conferir depois, não desativa usuário
 	public User inactivateUser(Long id, User operatorUser) {
 		User operator = findById(operatorUser.getId());
 		User newUser = findById(id);

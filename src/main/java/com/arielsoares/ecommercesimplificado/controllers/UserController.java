@@ -21,21 +21,18 @@ public class UserController {
 	@Autowired
 	private UserService service;
 
-	// OK
 	@GetMapping
 	public ResponseEntity<List<User>> findAll() {
 		List<User> list = service.findAll();
 		return ResponseEntity.ok().body(list);
 	}
 
-	// OK
 	@GetMapping(value = "/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
 		User obj = service.findById(id);
 		return ResponseEntity.ok().body(obj);
 	}
 
-	// OK
 	@PutMapping(value = "/updateUserRole/{id}/role/{userRole}")
 	public ResponseEntity<User> updateRole(@PathVariable Long id, @PathVariable String userRole) {
 		User operatorUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -43,7 +40,6 @@ public class UserController {
 		return ResponseEntity.ok().body(user);
 	}
 
-	//Ainda com problema / Foi dado um jeito mas ainda não é o devido
 	@PutMapping(value = "/inactiveUser/{id}")
 	public ResponseEntity<User> inactivateUser(@PathVariable Long id) {
 		User operatorUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

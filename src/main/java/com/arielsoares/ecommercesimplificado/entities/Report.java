@@ -9,6 +9,8 @@ public class Report {
     private Instant reportDate;
     private List<Order> orders;
     private Double totalSales;
+    
+    public Report() {}
 
     public Report(String reportType, Instant reportDate, List<Order> orders, Double totalSales) {
         this.reportType = reportType;

@@ -20,50 +20,33 @@ public class ReportService {
 	@Autowired
 	private OrderRepository orderRepository;
 
-    public Report generateSalesReportByDate(LocalDate date) {
-        List<Order> orders = orderRepository.findByMomentBetween(
-                date.atStartOfDay(ZoneOffset.UTC).toInstant(),
-                date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant()
-        );
-        Double totalSales = orders.stream().mapToDouble(Order::getTotal).sum();
+	public Report generateSalesReportByDate(LocalDate date) {
+		List<Order> orders = orderRepository.findByMomentBetween(date.atStartOfDay(ZoneOffset.UTC).toInstant(),
+				date.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant());
+		Double totalSales = orders.stream().mapToDouble(Order::getTotal).sum();
 
-        return new Report(
-                "Sales Report by Date",
-                date.atStartOfDay(ZoneOffset.UTC).toInstant(),
-                orders,
-                totalSales
-        );
-    }
+		return new Report("Sales Report by Date", date.atStartOfDay(ZoneOffset.UTC).toInstant(), orders, totalSales);
+	}
 
-    public Report generateSalesReportByMonth(YearMonth month) {
-        Instant startOfMonth = month.atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant endOfMonth = month.atEndOfMonth().atStartOfDay(ZoneOffset.UTC).toInstant();
+	public Report generateSalesReportByMonth(YearMonth month) {
+		Instant startOfMonth = month.atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+		Instant endOfMonth = month.atEndOfMonth().atStartOfDay(ZoneOffset.UTC).toInstant();
 
-        List<Order> orders = orderRepository.findByMomentBetween(startOfMonth, endOfMonth);
-        Double totalSales = orders.stream().mapToDouble(Order::getTotal).sum();
+		List<Order> orders = orderRepository.findByMomentBetween(startOfMonth, endOfMonth);
+		Double totalSales = orders.stream().mapToDouble(Order::getTotal).sum();
 
-        return new Report(
-                "Sales Report by Month",
-                startOfMonth,
-                orders,
-                totalSales
-        );
-    }
+		return new Report("Sales Report by Month", startOfMonth, orders, totalSales);
+	}
 
-    public Report generateWeeklySalesReport() {
-        LocalDate now = LocalDate.now();
-        LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
-        Instant startOfWeekInstant = startOfWeek.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant endOfWeekInstant = now.with(DayOfWeek.SUNDAY).plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+	public Report generateWeeklySalesReport() {
+		LocalDate now = LocalDate.now();
+		LocalDate startOfWeek = now.with(DayOfWeek.MONDAY);
+		Instant startOfWeekInstant = startOfWeek.atStartOfDay(ZoneOffset.UTC).toInstant();
+		Instant endOfWeekInstant = now.with(DayOfWeek.SUNDAY).plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
 
-        List<Order> orders = orderRepository.findByMomentBetween(startOfWeekInstant, endOfWeekInstant);
-        Double totalSales = orders.stream().mapToDouble(Order::getTotal).sum();
+		List<Order> orders = orderRepository.findByMomentBetween(startOfWeekInstant, endOfWeekInstant);
+		Double totalSales = orders.stream().mapToDouble(Order::getTotal).sum();
 
-        return new Report(
-                "Weekly Sales Report",
-                startOfWeekInstant,
-                orders,
-                totalSales
-        );
-    }
+		return new Report("Weekly Sales Report", startOfWeekInstant, orders, totalSales);
+	}
 }

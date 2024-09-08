@@ -16,20 +16,20 @@ import jakarta.persistence.OneToOne;
 @Entity
 public class PasswordResetToken {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String token;
+	private String token;
 
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
-    private User user;
+	@OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+	@JoinColumn(nullable = false, name = "user_id")
+	private User user;
 
-    private LocalDateTime expiryDate;
-    
-    public PasswordResetToken() {
-    }
+	private LocalDateTime expiryDate;
+
+	public PasswordResetToken() {
+	}
 
 	public PasswordResetToken(String token, User user) {
 		this.token = token;
@@ -68,10 +68,10 @@ public class PasswordResetToken {
 	public void setExpiryDate(LocalDateTime expiryDate) {
 		this.expiryDate = expiryDate;
 	}
-	
+
 	public boolean isExpired() {
-        return expiryDate.isBefore(LocalDateTime.now());
-    }
+		return expiryDate.isBefore(LocalDateTime.now());
+	}
 
 	@Override
 	public int hashCode() {
@@ -89,7 +89,5 @@ public class PasswordResetToken {
 		PasswordResetToken other = (PasswordResetToken) obj;
 		return Objects.equals(id, other.id);
 	}
-    
-    
 
 }

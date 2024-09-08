@@ -5,17 +5,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CacheCleaner implements CommandLineRunner{
+public class CacheCleaner implements CommandLineRunner {
 
-
-	@CacheEvict(value = {"products", "orders"}, allEntries = true)
+	@CacheEvict(value = { "products", "orders" }, allEntries = true)
 	@Override
 	public void run(String... args) throws Exception {
 		System.out.println("Cleaning Cache");
 	}
-	
-	
-	
-	
 
 }

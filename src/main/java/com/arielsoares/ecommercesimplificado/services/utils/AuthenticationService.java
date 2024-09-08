@@ -30,8 +30,6 @@ public class AuthenticationService {
 	private TokenService tokenService;
 	private AuthenticationManager authenticationManager;
 
-	// CLASSE TOTALMENTE TESTADA
-
 	public AuthenticationService(UserService userService, PasswordResetTokenRepository tokenRepository,
 			PasswordEncoder passwordEncoder, EmailService mailService, TokenService tokenService,
 			AuthenticationManager authenticationManager) {
@@ -69,12 +67,16 @@ public class AuthenticationService {
 	}
 
 	public Boolean resetPassword(String email) {
+
+		if (email == null)
+			throw new InvalidArgumentException("Please insert an e-mail for reseting password");
+
 		String resetToken = createPasswordResetToken(email);
 
 		if (resetToken != null) {
 			String subject = "Password Reset Request";
 			String body = "Use the following token to reset your password on the endpoint:"
-					+ " /reset-password/confirm \n This token will expire in 24 hours" + resetToken;
+					+ " /reset-password/confirm \n This token will expire in 24 hours \n Reset Token:  " + resetToken;
 
 			mailService.sendSimpleEmail(email, subject, body);
 			return true;
@@ -86,7 +88,6 @@ public class AuthenticationService {
 	public String confirmResetPassword(String token, String newPassword) {
 		PasswordResetToken resetToken = tokenRepository.findByToken(token);
 
-		// Customizar excessão
 		if (resetToken == null || resetToken.isExpired()) {
 			throw new InvalidTokenException("INVALID TOKEN");
 		}
