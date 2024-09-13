@@ -144,7 +144,7 @@ Corpo da Requisição (JSON):
  ###  **Reset de senha**
 - **Método:** `POST`
 - **URL:** `/auth/reset-password/confirm`
-- **Descrição:** Reset de senah a partir do token de recuperação.
+- **Descrição:** Reset de senha a partir do token de recuperação.
 
 Corpo da Requisição (JSON):
 ```json
@@ -155,6 +155,117 @@ Corpo da Requisição (JSON):
 ```
 
  Caso o token de recuperação não esteja expirado e nem esteja errado, a nova senha passada no corpo da requisição será atribuida ao usuário, e um login será feito simultaneamente, devolvendo no corpo da requisição o Token JWT de autenticação por requisição.
+
+  ###  **Criação de pedido**
+- **Método:** `POST`
+- **URL:** `/orders/newOrder`
+- **Descrição:** Criação de um novo pedido.
+
+Resposta da Requisição (JSON):
+```json
+{
+    "id": "??",
+    "moment": "2024-09-13T08:53:42Z",
+    "items": [],
+    "status": "OPEN",
+    "total": 0.0
+}
+```
+
+Neste sistema primeiro nós criamos a entidade de pedido, e então adicionamos a ela os itens de interesse assim como suas respectivas quantidades.
+
+ ###  **Adicionar itens ao pedido**
+- **Método:** `POST`
+- **URL:** `/orders/{orderId}/item`
+- **Descrição:** Adiciona novos itens ao pedido referente ao id passado na URL.
+
+Corpo da Requisição (JSON):
+```json
+{
+ "productId": 2,
+ "quantity": 5
+}
+```
+
+Resposta da Requisição (JSON):
+```json
+{
+    "id": "??",
+    "moment": "2024-09-13T08:53:42Z",
+    "items": [
+        {
+            "id": 19,
+            "quantity": 5,
+            "active": true,
+            "product": {
+                "id": 2,
+                "name": "Caneca",
+                "description": "Caneca de café",
+                "price": 10.0,
+                "storage_quantity": 0,
+                "active": true
+            },
+            "subTotal": 50.0
+        }
+    ],
+    "status": "OPEN",
+    "total": 50.0
+}
+```
+
+No caso do cliente ter adicionado ao pedido um item que deseja retirar oou que não queira aquela quantidade, é possível inativar o item de pedido através do seguinte endpoint:
+
+ ###  **Inativar item de pedido**
+- **Método:** `PUT`
+- **URL:** `/orders/{orderId}/inactivateOrderItem/{orderItemId}`
+- **Descrição:** Inativa o OrderItem referente ao id passado na URL da requisição.
+
+Resposta da Requisição (JSON):
+```json
+{
+    "id": "??",
+    "moment": "2024-09-13T08:57:57Z",
+    "items": [
+        {
+            "id": 19,
+            "quantity": 5,
+            "active": false,
+            "product": {
+                "id": 2,
+                "name": "Caneca",
+                "description": "Caneca de café",
+                "price": 10.0,
+                "storage_quantity": 15,
+                "active": true
+            },
+            "subTotal": 50.0
+        }
+    ],
+    "status": "OPEN",
+    "total": 0.0
+}
+```
+
+Uma compra só pode ser finalizada caso exista pelo menos um OrderItem ativo em que o produto referente também esteja ativo, caso contrário o processo não ocorrerá.
+
+###  **Fechamento de compra em caso de erro**
+- **Método:** `PUT`
+- **URL:** `/orders/{orderId}/orderStatus/{orderStatus}`
+- **Descrição:** Atualiza o status da compra com o status passado na URL.
+
+Resposta da Requisição (JSON):
+```json
+{
+    "timestamp": "2024-09-13T09:17:35Z",
+    "message": "Order can only be completed if it has at least 1 active Item and Product",
+    "details": "uri=/orders/??/orderStatus/paid",
+    "status": "BAD_REQUEST"
+}
+```
+
+Neste caso em específico, foi passado o status "paid" na URL, e com isso a compra seria completada caso tivesse um item válido para que isso ocorresse. Porém, o mesmo endpoint que atua para fechamento da venda, também pode ser usado para cancelar a mesma, basta passar o parâmetro "cancelled" na URL ao invés de "paid". Também é importante salientar que a compra não pode voltar os status, uma vez paga não poderá mais ser cancelada ou aberta, o mesmo ocorre com vendas canceladas.
+
+
 
 # Autor
 
